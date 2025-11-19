@@ -23,7 +23,7 @@ const config: runtime.GetPrismaClientConfig = {
       "value": "prisma-client"
     },
     "output": {
-      "value": "/Users/eimg/Desktop/su/src/generated/prisma",
+      "value": "/Users/eimg/Desktop/daily-buddies/api/src/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -37,7 +37,7 @@ const config: runtime.GetPrismaClientConfig = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/eimg/Desktop/su/prisma/schema.prisma",
+    "sourceFilePath": "/Users/eimg/Desktop/daily-buddies/api/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativePath": "../../../prisma",

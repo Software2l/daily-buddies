@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import "dotenv/config";
 import bcrypt from "bcryptjs";
 import {
@@ -36,8 +37,11 @@ async function resetData() {
     prisma.teamMission.deleteMany(),
     prisma.rewardRedemption.deleteMany(),
     prisma.rewardDefinition.deleteMany(),
+    prisma.privilegeRequest.deleteMany(),
+    prisma.privilegeDefinition.deleteMany(),
     prisma.taskCompletion.deleteMany(),
     prisma.task.deleteMany(),
+    prisma.streakRewardLog.deleteMany(),
     prisma.kindNote.deleteMany(),
     prisma.moodEntry.deleteMany(),
     prisma.user.deleteMany(),
