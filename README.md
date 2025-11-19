@@ -2,6 +2,8 @@
 
 Daily Buddies is a playful parent/child chore companion. The backend is an Express API with Prisma + SQLite, and the mobile app is built with Expo Router + React Native.
 
+![Daily Buddies Screenshot](https://i.imgur.com/fmpwb6Y.jpeg)
+
 ## Features
 
 - Parent dashboard to manage kids, assign one-off tasks, and build reusable routines
@@ -38,6 +40,8 @@ git clone https://github.com/eimg/daily-buddies.git
 ```bash
 # API
 cd daily-buddies/api
+cp .env.example .env   # includes DATABASE_URL for Prisma + default JWT secret
+# (edit .env if you want a different DB location or secret)
 npm install
 npx prisma migrate dev
 npx prisma db seed
@@ -56,6 +60,12 @@ npm start           # run Expo (press i for iOS simulator, a for Android, or sca
 ```bash
 npm test
 ```
+
+## Environment Variables
+
+- `api/.env.example` ships with sane defaults (`DATABASE_URL="file:./dev.db"`, `PORT=4000`, `JWT_SECRET="change-me"`).
+- Copy it to `api/.env` before running any Prisma commands so migrations can create the SQLite database.  
+  Customize those values if you plan to use a different database or secret in your own environment.
 
 ## Test Accounts (seed data)
 

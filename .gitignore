@@ -1,5 +1,6 @@
 .DS_Store
 .env
+api/.env
 node_modules
 dist
-prisma/dev.db
+api/prisma/dev.db

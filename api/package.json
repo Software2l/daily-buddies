@@ -1,6 +1,6 @@
 {
-  "name": "su",
-  "version": "1.0.0",
+  "name": "daily-buddies-api",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
