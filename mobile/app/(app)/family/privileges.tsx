@@ -23,6 +23,17 @@ import {
   terminatePrivilegeRequest,
 } from "../../../src/services/api";
 
+const TONE_COLORS: Record<string, string> = {
+  sunrise: "#fb923c",
+  forest: "#22c55e",
+  ocean: "#38bdf8",
+  lavender: "#c084fc",
+  sunset: "#f87171",
+  default: "#94a3b8",
+};
+
+const getToneColor = (tone?: string | null) => TONE_COLORS[tone ?? ""] ?? TONE_COLORS.default;
+
 export default function FamilyPrivilegesScreen() {
   const router = useRouter();
   const { token, profile } = useAuth();
@@ -207,7 +218,15 @@ export default function FamilyPrivilegesScreen() {
                 <View key={ticket.id} style={styles.requestRow}>
                   <View style={styles.requestHeader}>
                     <View style={styles.requestInfo}>
-                      <Text style={styles.privilegeTitle}>{ticket.privilege.title}</Text>
+                      <View style={styles.metaRow}>
+                        <View
+                          style={[
+                            styles.avatarDot,
+                            { backgroundColor: getToneColor(ticket.childAvatarTone ?? profile?.avatarTone) },
+                          ]}
+                        />
+                        <Text style={styles.privilegeTitle}>{ticket.privilege.title}</Text>
+                      </View>
                       <Text style={styles.lightText}>
                         {ticket.childName ?? "Unknown child"} • {ticket.cost} seeds
                       </Text>
@@ -361,6 +380,16 @@ const styles = StyleSheet.create({
   privilegeTitle: {
     fontWeight: "600",
     color: "#1f2937",
+  },
+  avatarDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   privilegeCost: {
     color: "#4c1d95",

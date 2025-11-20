@@ -267,9 +267,23 @@ export default function TasksScreen() {
                   {task.assignments.length === 0 ? (
                     <Text style={styles.lightText}>No children assigned yet.</Text>
                   ) : (
-                    <Text style={styles.lightText}>
-                      {task.assignments.map((assignment) => assignment.childName).join(", ")}
-                    </Text>
+                    <View style={styles.assignmentRow}>
+                      {task.assignments.map((assignment) => (
+                        <View key={assignment.childId} style={styles.assignmentPill}>
+                          <View
+                            style={[
+                              styles.avatarDot,
+                              {
+                                backgroundColor:
+                                  TONE_COLORS[assignment.childAvatarTone ?? "default"] ??
+                                  TONE_COLORS.default,
+                              },
+                            ]}
+                          />
+                          <Text style={styles.assignmentText}>{assignment.childName}</Text>
+                        </View>
+                      ))}
+                    </View>
                   )}
                   <TouchableOpacity
                     style={styles.manageButton}
@@ -801,6 +815,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   assignmentText: {
     color: "#4f46e5",
@@ -892,7 +909,6 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    marginRight: 6,
   },
   manageButton: {
     marginTop: 12,

@@ -14,6 +14,17 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../src/context/AuthContext";
 import { fetchFamilyOverview, FamilyOverviewEntry } from "../../src/services/api";
 
+const TONE_COLORS: Record<string, string> = {
+  sunrise: "#fb923c",
+  forest: "#22c55e",
+  ocean: "#38bdf8",
+  lavender: "#c084fc",
+  sunset: "#f87171",
+  default: "#94a3b8",
+};
+
+const getToneColor = (tone?: string | null) => TONE_COLORS[tone ?? ""] ?? TONE_COLORS.default;
+
 export default function FamilyScreen() {
   const router = useRouter();
   const { token, logout, profile } = useAuth();
@@ -51,7 +62,7 @@ export default function FamilyScreen() {
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Text style={styles.backLabel}>← Back</Text>
           </TouchableOpacity>
-          <Text style={styles.header}>Family Center 🌼</Text>
+          <Text style={styles.header}>Family Hub 🌼</Text>
         </View>
 
           <Text style={styles.subtitle}>Accounts and progress at a glance.</Text>
@@ -105,22 +116,47 @@ const humanizeStatLabel = (label: string) => {
 
 const MemberCard = ({ member }: { member: FamilyOverviewEntry }) => {
   const statsEntries = Object.entries(member.stats ?? {});
+  const roleLabel = member.role === "CHILD" ? "Child" : "Parent";
 
   return (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>
-        {member.name} {member.role === "CHILD" ? "🌱" : "🌼"}
-      </Text>
-      <Text style={styles.cardSubtitle}>{member.role === "CHILD" ? "Child" : "Parent"}</Text>
-      <Text style={styles.usernameText}>@{member.username}</Text>
+      <View style={styles.memberTop}>
+        <View style={styles.nameRow}>
+          <View
+            style={[
+              styles.avatarDot,
+              { backgroundColor: getToneColor(member.avatarTone) },
+            ]}
+          />
+          <View style={styles.nameBlock}>
+            <Text style={styles.cardTitle}>{member.name}</Text>
+            <Text style={styles.usernameChip}>@{member.username}</Text>
+          </View>
+        </View>
+        <View
+          style={[
+            styles.rolePill,
+            member.role === "CHILD" ? styles.roleChild : styles.roleParent,
+          ]}
+        >
+          <Text
+            style={[
+              styles.roleText,
+              member.role === "CHILD" ? styles.roleTextChild : styles.roleTextParent,
+            ]}
+          >
+            {roleLabel}
+          </Text>
+        </View>
+      </View>
       {statsEntries.length === 0 ? (
         <Text style={styles.lightText}>No stats yet.</Text>
       ) : (
-        <View style={styles.statsRow}>
+        <View style={styles.statsGrid}>
           {statsEntries.map(([label, value]) => (
-            <View key={label} style={styles.statChip}>
-              <Text style={styles.statLabel}>{humanizeStatLabel(label)}</Text>
+            <View key={label} style={styles.statCard}>
               <Text style={styles.statValue}>{value}</Text>
+              <Text style={styles.statLabel}>{humanizeStatLabel(label)}</Text>
             </View>
           ))}
         </View>
@@ -181,30 +217,86 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#1f2937",
   },
+  memberTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    justifyContent: "space-between",
+  },
+  nameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    flex: 1,
+    minWidth: 0,
+  },
+  nameBlock: {
+    flexShrink: 1,
+    minWidth: 0,
+  },
+  avatarDot: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+  },
   cardSubtitle: {
     color: "#94a3b8",
   },
-  usernameText: {
+  usernameChip: {
     color: "#6b7280",
     fontSize: 12,
+    backgroundColor: "#f3f4f6",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+    alignSelf: "flex-start",
+    marginTop: 4,
   },
-  statsRow: {
+  statsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: 10,
   },
-  statChip: {
-    backgroundColor: "#eef2ff",
+  statCard: {
+    backgroundColor: "#f3f4ff",
     borderRadius: 12,
     paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingVertical: 8,
+    minWidth: 110,
+    flexGrow: 1,
   },
   statLabel: {
     fontSize: 12,
     color: "#6b7280",
   },
   statValue: {
-    fontWeight: "600",
+    fontWeight: "700",
+    color: "#1f2937",
+  },
+  rolePill: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  roleChild: {
+    backgroundColor: "#ecfeff",
+    borderColor: "#bae6fd",
+  },
+  roleParent: {
+    backgroundColor: "#f4f3ff",
+    borderColor: "#e0e7ff",
+  },
+  roleText: {
+    fontWeight: "700",
+    fontSize: 12,
+    textTransform: "uppercase",
+  },
+  roleTextChild: {
+    color: "#0369a1",
+  },
+  roleTextParent: {
     color: "#4338ca",
   },
   lightText: {

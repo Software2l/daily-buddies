@@ -24,6 +24,17 @@ const statusCopy: Record<string, string> = {
   REJECTED: "Try again soon",
 };
 
+const TONE_COLORS: Record<string, string> = {
+  sunrise: "#fb923c",
+  forest: "#22c55e",
+  ocean: "#38bdf8",
+  lavender: "#c084fc",
+  sunset: "#f87171",
+  default: "#94a3b8",
+};
+
+const getToneColor = (tone?: string | null) => TONE_COLORS[tone ?? ""] ?? TONE_COLORS.default;
+
 export default function PrivilegesScreen() {
   const router = useRouter();
   const { token, profile } = useAuth();
@@ -69,6 +80,7 @@ export default function PrivilegesScreen() {
   const approvedTickets = requests.filter((entry) => entry.status === "APPROVED");
   const pendingRequests = requests.filter((entry) => entry.status === "PENDING");
   const rejectedRequests = requests.filter((entry) => entry.status === "REJECTED");
+  const profileTone = profile?.avatarTone;
 
   if (!token) {
     return null;
@@ -154,6 +166,15 @@ export default function PrivilegesScreen() {
               ) : (
                 approvedTickets.map((ticket) => (
                   <View key={ticket.id} style={styles.ticketCard}>
+                    <View style={styles.metaRow}>
+                      <View
+                        style={[
+                          styles.avatarDot,
+                          { backgroundColor: getToneColor(ticket.childAvatarTone ?? profileTone) },
+                        ]}
+                      />
+                      <Text style={styles.ticketMeta}>{ticket.childName ?? "You"}</Text>
+                    </View>
                     <Text style={styles.ticketTitle}>{ticket.privilege.title}</Text>
                     <Text style={styles.ticketCost}>{ticket.cost} seeds</Text>
                     <Text style={styles.ticketMeta}>
@@ -171,9 +192,17 @@ export default function PrivilegesScreen() {
               ) : (
                 pendingRequests.map((request) => (
                   <View key={request.id} style={styles.pendingRow}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.pendingTitle}>{request.privilege.title}</Text>
-                      <Text style={styles.lightText}>{request.cost} seeds</Text>
+                    <View style={styles.metaRow}>
+                      <View
+                        style={[
+                          styles.avatarDot,
+                          { backgroundColor: getToneColor(request.childAvatarTone ?? profileTone) },
+                        ]}
+                      />
+                      <View>
+                        <Text style={styles.pendingTitle}>{request.privilege.title}</Text>
+                        <Text style={styles.lightText}>{request.cost} seeds</Text>
+                      </View>
                     </View>
                     <Text style={styles.pendingStatus}>Waiting...</Text>
                   </View>
@@ -181,14 +210,22 @@ export default function PrivilegesScreen() {
               )}
             </View>
 
-            {rejectedRequests.length > 0 ? (
+              {rejectedRequests.length > 0 ? (
               <View style={styles.card}>
                 <Text style={styles.sectionTitle}>Recently reviewed</Text>
                 {rejectedRequests.map((request) => (
                   <View key={request.id} style={styles.pendingRow}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.pendingTitle}>{request.privilege.title}</Text>
-                      <Text style={styles.lightText}>Try requesting again later.</Text>
+                    <View style={styles.metaRow}>
+                      <View
+                        style={[
+                          styles.avatarDot,
+                          { backgroundColor: getToneColor(request.childAvatarTone ?? profileTone) },
+                        ]}
+                      />
+                      <View>
+                        <Text style={styles.pendingTitle}>{request.privilege.title}</Text>
+                        <Text style={styles.lightText}>Try requesting again later.</Text>
+                      </View>
                     </View>
                     <Text style={styles.rejectedStatus}>Rejected</Text>
                   </View>
@@ -328,6 +365,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    justifyContent: "space-between",
+  },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flex: 1,
   },
   pendingTitle: {
     fontWeight: "600",
@@ -347,5 +391,10 @@ const styles = StyleSheet.create({
   linkText: {
     color: "#6c63ff",
     fontWeight: "600",
+  },
+  avatarDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
 });

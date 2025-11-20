@@ -1,15 +1,5 @@
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  TextInput,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, TextInput, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -27,7 +17,6 @@ import {
 export default function ParentManageScreen() {
   const router = useRouter();
   const { token } = useAuth();
-  const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
   const isAuthenticated = Boolean(token);
 
@@ -151,7 +140,7 @@ export default function ParentManageScreen() {
 
   if (!isAuthenticated) {
     return (
-      <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
+      <SafeAreaView style={styles.safe}>
         <View style={styles.centered}>
           <Text style={styles.lightText}>Connecting to your family...</Text>
         </View>
@@ -160,160 +149,218 @@ export default function ParentManageScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-      >
-        <ScrollView
-          contentContainerStyle={[styles.container, { paddingBottom: 32 + insets.bottom }]}
-          keyboardShouldPersistTaps="always"
-          keyboardDismissMode="none"
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.headerRow}>
-            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-              <Text style={styles.backLabel}>← Back</Text>
-            </TouchableOpacity>
-            <Text style={styles.header}>Manage Accounts</Text>
-          </View>
+		<SafeAreaView style={styles.safe}>
+			<ScrollView contentContainerStyle={styles.container}>
+				<View style={styles.headerRow}>
+					<TouchableOpacity
+						style={styles.backButton}
+						onPress={() => router.back()}>
+						<Text style={styles.backLabel}>← Back</Text>
+					</TouchableOpacity>
+					<Text style={styles.header}>Manage Accounts 👨‍👩‍👧</Text>
+				</View>
 
-        <Text style={styles.sectionTitle}>Parents</Text>
-        {parents.map((parent, index) => (
-          <MemberRow
-            key={parent.id}
-            member={parent}
-            onSave={(payload) => updateMemberMutation.mutate({ userId: parent.id, payload })}
-            onRemove={
-              index === 0
-                ? undefined
-                : () =>
-                    Alert.alert(
-                      "Remove parent?",
-                      "This parent will lose access to the family account.",
-                      [
-                        { text: "Cancel", style: "cancel" },
-                        {
-                          text: "Remove",
-                          style: "destructive",
-                          onPress: () => deleteMemberMutation.mutate(parent.id),
-                        },
-                      ],
-                    )
-            }
-          />
-        ))}
+				<Text style={styles.sectionTitle}>Parents</Text>
+				{parents.map((parent, index) => (
+					<MemberRow
+						key={parent.id}
+						member={parent}
+						onSave={payload =>
+							updateMemberMutation.mutate({
+								userId: parent.id,
+								payload,
+							})
+						}
+						onRemove={
+							index === 0
+								? undefined
+								: () =>
+										Alert.alert(
+											"Remove parent?",
+											"This parent will lose access to the family account.",
+											[
+												{
+													text: "Cancel",
+													style: "cancel",
+												},
+												{
+													text: "Remove",
+													style: "destructive",
+													onPress: () =>
+														deleteMemberMutation.mutate(
+															parent.id
+														),
+												},
+											]
+										)
+						}
+					/>
+				))}
 
-        <View style={styles.inviteCard}>
-          <Text style={styles.sectionTitle}>Invite another parent</Text>
-          <Input
-            placeholder="Name"
-            value={parentForm.name}
-            onChangeText={(value: string) => setParentForm((prev) => ({ ...prev, name: value }))}
-          />
-          <Input
-            placeholder="Username"
-            autoCapitalize="none"
-            value={parentForm.username}
-            onChangeText={(value: string) => setParentForm((prev) => ({ ...prev, username: value }))}
-          />
-          <Input
-            placeholder="Email"
-            autoCapitalize="none"
-            keyboardType="email-address"
-            value={parentForm.email}
-            onChangeText={(value: string) => setParentForm((prev) => ({ ...prev, email: value }))}
-          />
-          <Input
-            placeholder="Password"
-            secureTextEntry
-            value={parentForm.password}
-            onChangeText={(value: string) => setParentForm((prev) => ({ ...prev, password: value }))}
-          />
-          <PrimaryButton title="Send Invite" onPress={handleInviteParent} />
-        </View>
+				<View style={styles.inviteCard}>
+					<Text style={styles.sectionTitle}>
+						Invite another parent
+					</Text>
+					<Input
+						placeholder="Name"
+						value={parentForm.name}
+						onChangeText={(value: string) =>
+							setParentForm(prev => ({ ...prev, name: value }))
+						}
+					/>
+					<Input
+						placeholder="Username"
+						autoCapitalize="none"
+						value={parentForm.username}
+						onChangeText={(value: string) =>
+							setParentForm(prev => ({
+								...prev,
+								username: value,
+							}))
+						}
+					/>
+					<Input
+						placeholder="Email"
+						autoCapitalize="none"
+						keyboardType="email-address"
+						value={parentForm.email}
+						onChangeText={(value: string) =>
+							setParentForm(prev => ({ ...prev, email: value }))
+						}
+					/>
+					<Input
+						placeholder="Password"
+						secureTextEntry
+						value={parentForm.password}
+						onChangeText={(value: string) =>
+							setParentForm(prev => ({
+								...prev,
+								password: value,
+							}))
+						}
+					/>
+					<PrimaryButton
+						title="Send Invite"
+						onPress={handleInviteParent}
+					/>
+				</View>
 
-        <Text style={styles.sectionTitle}>Children</Text>
-        {children.map((child) => (
-          <MemberRow
-            key={child.id}
-            member={child}
-            onSave={(payload) => updateMemberMutation.mutate({ userId: child.id, payload })}
-            onRemove={() =>
-              Alert.alert(
-                "Remove child?",
-                "Their tasks, routines, and rewards history will also be deleted.",
-                [
-                  { text: "Cancel", style: "cancel" },
-                  {
-                    text: "Remove",
-                    style: "destructive",
-                    onPress: () => deleteMemberMutation.mutate(child.id),
-                  },
-                ],
-              )
-            }
-          />
-        ))}
+				<Text style={styles.sectionTitle}>Children</Text>
+				{children.map(child => (
+					<MemberRow
+						key={child.id}
+						member={child}
+						onSave={payload =>
+							updateMemberMutation.mutate({
+								userId: child.id,
+								payload,
+							})
+						}
+						onRemove={() =>
+							Alert.alert(
+								"Remove child?",
+								"Their tasks, routines, and rewards history will also be deleted.",
+								[
+									{ text: "Cancel", style: "cancel" },
+									{
+										text: "Remove",
+										style: "destructive",
+										onPress: () =>
+											deleteMemberMutation.mutate(
+												child.id
+											),
+									},
+								]
+							)
+						}
+					/>
+				))}
 
-        <View style={styles.inviteCard}>
-          <Text style={styles.sectionTitle}>Add a child</Text>
-          <Input
-            placeholder="Name"
-            value={childForm.name}
-            onChangeText={(value: string) => setChildForm((prev) => ({ ...prev, name: value }))}
-          />
-          <Input
-            placeholder="Username"
-            autoCapitalize="none"
-            value={childForm.username}
-            onChangeText={(value: string) => setChildForm((prev) => ({ ...prev, username: value }))}
-          />
-          <Input
-            placeholder="Email (optional)"
-            autoCapitalize="none"
-            keyboardType="email-address"
-            value={childForm.email}
-            onChangeText={(value: string) => setChildForm((prev) => ({ ...prev, email: value }))}
-          />
-          <Input
-            placeholder="Password"
-            secureTextEntry
-            value={childForm.password}
-            onChangeText={(value: string) => setChildForm((prev) => ({ ...prev, password: value }))}
-          />
-          <TonePicker value={childForm.avatarTone} onChange={(avatarTone) => setChildForm((prev) => ({ ...prev, avatarTone }))} />
-          <PrimaryButton title="Add Child" onPress={handleAddChild} />
-        </View>
+				<View style={styles.inviteCard}>
+					<Text style={styles.sectionTitle}>Add a child</Text>
+					<Input
+						placeholder="Name"
+						value={childForm.name}
+						onChangeText={(value: string) =>
+							setChildForm(prev => ({ ...prev, name: value }))
+						}
+					/>
+					<Input
+						placeholder="Username"
+						autoCapitalize="none"
+						value={childForm.username}
+						onChangeText={(value: string) =>
+							setChildForm(prev => ({ ...prev, username: value }))
+						}
+					/>
+					<Input
+						placeholder="Email (optional)"
+						autoCapitalize="none"
+						keyboardType="email-address"
+						value={childForm.email}
+						onChangeText={(value: string) =>
+							setChildForm(prev => ({ ...prev, email: value }))
+						}
+					/>
+					<Input
+						placeholder="Password"
+						secureTextEntry
+						value={childForm.password}
+						onChangeText={(value: string) =>
+							setChildForm(prev => ({ ...prev, password: value }))
+						}
+					/>
+					<TonePicker
+						value={childForm.avatarTone}
+						onChange={avatarTone =>
+							setChildForm(prev => ({ ...prev, avatarTone }))
+						}
+					/>
+					<PrimaryButton
+						title="Add Child"
+						onPress={handleAddChild}
+					/>
+				</View>
 
-        <View style={styles.dangerCard}>
-          <Text style={styles.sectionTitle}>Delete family account</Text>
-          <Text style={styles.warningText}>
-            This will permanently remove all accounts, data, and rewards for this family. This action
-            cannot be undone.
-          </Text>
-          <TouchableOpacity
-            style={[styles.deleteButton, deleteFamilyMutation.isPending && styles.disabledButton]}
-            onPress={() =>
-              Alert.alert(
-                "Delete family?",
-                "This will permanently erase your family data.",
-                [
-                  { text: "Cancel", style: "cancel" },
-                  { text: "Delete", style: "destructive", onPress: () => deleteFamilyMutation.mutate() },
-                ],
-              )
-            }
-            disabled={deleteFamilyMutation.isPending}
-          >
-            <Text style={styles.deleteButtonText}>
-              {deleteFamilyMutation.isPending ? "Deleting..." : "Delete Family"}
-            </Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+				<View style={styles.dangerCard}>
+					<Text style={styles.sectionTitle}>
+						Delete family account
+					</Text>
+					<Text style={styles.warningText}>
+						This will permanently remove all accounts, data, and
+						rewards for this family. This action cannot be undone.
+					</Text>
+					<TouchableOpacity
+						style={[
+							styles.deleteButton,
+							deleteFamilyMutation.isPending &&
+								styles.disabledButton,
+						]}
+						onPress={() =>
+							Alert.alert(
+								"Delete family?",
+								"This will permanently erase your family data.",
+								[
+									{ text: "Cancel", style: "cancel" },
+									{
+										text: "Delete",
+										style: "destructive",
+										onPress: () =>
+											deleteFamilyMutation.mutate(),
+									},
+								]
+							)
+						}
+						disabled={deleteFamilyMutation.isPending}>
+						<Text style={styles.deleteButtonText}>
+							{deleteFamilyMutation.isPending
+								? "Deleting..."
+								: "Delete Family"}
+						</Text>
+					</TouchableOpacity>
+				</View>
+			</ScrollView>
+		</SafeAreaView>
   );
 }
 

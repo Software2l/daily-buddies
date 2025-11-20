@@ -18,9 +18,21 @@ const formatDate = (value?: string | null) => {
   return new Date(value).toLocaleDateString();
 };
 
+const TONE_COLORS: Record<string, string> = {
+  sunrise: "#fb923c",
+  forest: "#22c55e",
+  ocean: "#38bdf8",
+  lavender: "#c084fc",
+  sunset: "#f87171",
+  default: "#94a3b8",
+};
+
+const getToneColor = (tone?: string | null) => TONE_COLORS[tone ?? ""] ?? TONE_COLORS.default;
+
 export default function PrivilegeHistoryScreen() {
   const router = useRouter();
   const { token, profile } = useAuth();
+  const profileTone = profile?.avatarTone;
   const isParent = profile?.role === "PARENT";
 
   const historyQuery = useQuery({
@@ -44,9 +56,9 @@ export default function PrivilegeHistoryScreen() {
           </TouchableOpacity>
           <Text style={styles.header}>{isParent ? "Ticket History 📜" : "My Tickets 📜"}</Text>
         </View>
-        <Text style={styles.subtitle}>
-          {isParent ? "Review every ticket that was closed." : "Here’s where ended tickets live."}
-        </Text>
+          <Text style={styles.subtitle}>
+            {isParent ? "Review every ticket that was closed." : "Here’s where ended tickets live."}
+          </Text>
 
         {historyQuery.isError ? (
           <Text style={styles.lightText}>
@@ -57,7 +69,15 @@ export default function PrivilegeHistoryScreen() {
         ) : (
           entries.map((entry) => (
             <View key={entry.id} style={styles.historyCard}>
-              <Text style={styles.ticketTitle}>{entry.privilege.title}</Text>
+              <View style={styles.metaRow}>
+                <View
+                  style={[
+                    styles.avatarDot,
+                    { backgroundColor: getToneColor(entry.childAvatarTone ?? profileTone) },
+                  ]}
+                />
+                <Text style={styles.ticketTitle}>{entry.privilege.title}</Text>
+              </View>
               <Text style={styles.ticketMeta}>
                 Cost: <Text style={styles.bold}>{entry.cost} seeds</Text>
               </Text>
@@ -120,6 +140,16 @@ const styles = StyleSheet.create({
     gap: 6,
     borderWidth: 1,
     borderColor: "#e0e7ff",
+  },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  avatarDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
   ticketTitle: {
     fontWeight: "600",

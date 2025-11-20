@@ -413,7 +413,7 @@ const ParentHome = ({
 					<TouchableOpacity
 						style={styles.ghostButton}
 						onPress={() => router.push("/family")}>
-						<Text style={styles.ghostText}>Family Center</Text>
+						<Text style={styles.ghostText}>Family Hub</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
 						style={styles.ghostButton}
@@ -1224,6 +1224,7 @@ const styles = StyleSheet.create({
 		width: 10,
 		height: 10,
 		borderRadius: 5,
+        marginTop: 4,
 	},
 	textButton: {
 		alignItems: "center",
