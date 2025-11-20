@@ -1,5 +1,15 @@
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View, TextInput, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  TextInput,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -17,6 +27,7 @@ import {
 export default function ParentManageScreen() {
   const router = useRouter();
   const { token } = useAuth();
+  const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
   const isAuthenticated = Boolean(token);
 
@@ -140,7 +151,7 @@ export default function ParentManageScreen() {
 
   if (!isAuthenticated) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
         <View style={styles.centered}>
           <Text style={styles.lightText}>Connecting to your family...</Text>
         </View>
@@ -149,14 +160,23 @@ export default function ParentManageScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backLabel}>← Back</Text>
-          </TouchableOpacity>
-          <Text style={styles.header}>Family Hub 👨‍👩‍👧</Text>
-        </View>
+    <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          contentContainerStyle={[styles.container, { paddingBottom: 32 + insets.bottom }]}
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode="none"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.headerRow}>
+            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+              <Text style={styles.backLabel}>← Back</Text>
+            </TouchableOpacity>
+            <Text style={styles.header}>Manage Accounts</Text>
+          </View>
 
         <Text style={styles.sectionTitle}>Parents</Text>
         {parents.map((parent, index) => (
@@ -289,9 +309,10 @@ export default function ParentManageScreen() {
             <Text style={styles.deleteButtonText}>
               {deleteFamilyMutation.isPending ? "Deleting..." : "Delete Family"}
             </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
