@@ -58,6 +58,7 @@ export const ModelName = {
   StreakRewardLog: 'StreakRewardLog',
   PrivilegeDefinition: 'PrivilegeDefinition',
   PrivilegeRequest: 'PrivilegeRequest',
+  PointAdjustment: 'PointAdjustment',
   MoodEntry: 'MoodEntry',
   KindNote: 'KindNote',
   TeamMission: 'TeamMission',
@@ -210,6 +211,20 @@ export const PrivilegeRequestScalarFieldEnum = {
 } as const
 
 export type PrivilegeRequestScalarFieldEnum = (typeof PrivilegeRequestScalarFieldEnum)[keyof typeof PrivilegeRequestScalarFieldEnum]
+
+
+export const PointAdjustmentScalarFieldEnum = {
+  id: 'id',
+  familyId: 'familyId',
+  childId: 'childId',
+  createdById: 'createdById',
+  points: 'points',
+  type: 'type',
+  note: 'note',
+  createdAt: 'createdAt'
+} as const
+
+export type PointAdjustmentScalarFieldEnum = (typeof PointAdjustmentScalarFieldEnum)[keyof typeof PointAdjustmentScalarFieldEnum]
 
 
 export const MoodEntryScalarFieldEnum = {

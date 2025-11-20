@@ -28,6 +28,7 @@ model Family {
   streakRewards StreakRewardLog[]
   privileges   PrivilegeDefinition[]
   privilegeRequests PrivilegeRequest[]
+  pointAdjustments PointAdjustment[]
 }
 
 model User {
@@ -60,6 +61,8 @@ model User {
   streakRewards StreakRewardLog[]
   privilegeRequests PrivilegeRequest[]
   privilegesCreated PrivilegeDefinition[]
+  pointAdjustmentsGiven PointAdjustment[] @relation("ParentAdjustments")
+  pointAdjustmentsReceived PointAdjustment[] @relation("ChildAdjustments")
 }
 
 model Task {
@@ -160,6 +163,20 @@ model PrivilegeRequest {
   note        String?
   createdAt   DateTime @default(now())
   resolvedAt  DateTime?
+}
+
+model PointAdjustment {
+  id          String                 @id @default(cuid())
+  familyId    String
+  family      Family                 @relation(fields: [familyId], references: [id])
+  childId     String
+  child       User                   @relation("ChildAdjustments", fields: [childId], references: [id])
+  createdById String
+  createdBy   User                   @relation("ParentAdjustments", fields: [createdById], references: [id])
+  points      Int
+  type        PointAdjustmentType
+  note        String?
+  createdAt   DateTime               @default(now())
 }
 
 model MoodEntry {
@@ -306,6 +323,11 @@ enum PrivilegeRequestStatus {
   APPROVED
   REJECTED
   TERMINATED
+}
+
+enum PointAdjustmentType {
+  GIFT
+  PENALTY
 }
 
 enum TeamMissionStatus {

@@ -260,6 +260,7 @@ export type FamilyWhereInput = {
   streakRewards?: Prisma.StreakRewardLogListRelationFilter
   privileges?: Prisma.PrivilegeDefinitionListRelationFilter
   privilegeRequests?: Prisma.PrivilegeRequestListRelationFilter
+  pointAdjustments?: Prisma.PointAdjustmentListRelationFilter
 }
 
 export type FamilyOrderByWithRelationInput = {
@@ -279,6 +280,7 @@ export type FamilyOrderByWithRelationInput = {
   streakRewards?: Prisma.StreakRewardLogOrderByRelationAggregateInput
   privileges?: Prisma.PrivilegeDefinitionOrderByRelationAggregateInput
   privilegeRequests?: Prisma.PrivilegeRequestOrderByRelationAggregateInput
+  pointAdjustments?: Prisma.PointAdjustmentOrderByRelationAggregateInput
 }
 
 export type FamilyWhereUniqueInput = Prisma.AtLeast<{
@@ -301,6 +303,7 @@ export type FamilyWhereUniqueInput = Prisma.AtLeast<{
   streakRewards?: Prisma.StreakRewardLogListRelationFilter
   privileges?: Prisma.PrivilegeDefinitionListRelationFilter
   privilegeRequests?: Prisma.PrivilegeRequestListRelationFilter
+  pointAdjustments?: Prisma.PointAdjustmentListRelationFilter
 }, "id">
 
 export type FamilyOrderByWithAggregationInput = {
@@ -350,6 +353,7 @@ export type FamilyCreateInput = {
   streakRewards?: Prisma.StreakRewardLogCreateNestedManyWithoutFamilyInput
   privileges?: Prisma.PrivilegeDefinitionCreateNestedManyWithoutFamilyInput
   privilegeRequests?: Prisma.PrivilegeRequestCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyUncheckedCreateInput = {
@@ -369,6 +373,7 @@ export type FamilyUncheckedCreateInput = {
   streakRewards?: Prisma.StreakRewardLogUncheckedCreateNestedManyWithoutFamilyInput
   privileges?: Prisma.PrivilegeDefinitionUncheckedCreateNestedManyWithoutFamilyInput
   privilegeRequests?: Prisma.PrivilegeRequestUncheckedCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyUpdateInput = {
@@ -388,6 +393,7 @@ export type FamilyUpdateInput = {
   streakRewards?: Prisma.StreakRewardLogUpdateManyWithoutFamilyNestedInput
   privileges?: Prisma.PrivilegeDefinitionUpdateManyWithoutFamilyNestedInput
   privilegeRequests?: Prisma.PrivilegeRequestUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyUncheckedUpdateInput = {
@@ -407,6 +413,7 @@ export type FamilyUncheckedUpdateInput = {
   streakRewards?: Prisma.StreakRewardLogUncheckedUpdateManyWithoutFamilyNestedInput
   privileges?: Prisma.PrivilegeDefinitionUncheckedUpdateManyWithoutFamilyNestedInput
   privilegeRequests?: Prisma.PrivilegeRequestUncheckedUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyCreateManyInput = {
@@ -601,6 +608,20 @@ export type FamilyUpdateOneRequiredWithoutPrivilegeRequestsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.FamilyUpdateToOneWithWhereWithoutPrivilegeRequestsInput, Prisma.FamilyUpdateWithoutPrivilegeRequestsInput>, Prisma.FamilyUncheckedUpdateWithoutPrivilegeRequestsInput>
 }
 
+export type FamilyCreateNestedOneWithoutPointAdjustmentsInput = {
+  create?: Prisma.XOR<Prisma.FamilyCreateWithoutPointAdjustmentsInput, Prisma.FamilyUncheckedCreateWithoutPointAdjustmentsInput>
+  connectOrCreate?: Prisma.FamilyCreateOrConnectWithoutPointAdjustmentsInput
+  connect?: Prisma.FamilyWhereUniqueInput
+}
+
+export type FamilyUpdateOneRequiredWithoutPointAdjustmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.FamilyCreateWithoutPointAdjustmentsInput, Prisma.FamilyUncheckedCreateWithoutPointAdjustmentsInput>
+  connectOrCreate?: Prisma.FamilyCreateOrConnectWithoutPointAdjustmentsInput
+  upsert?: Prisma.FamilyUpsertWithoutPointAdjustmentsInput
+  connect?: Prisma.FamilyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.FamilyUpdateToOneWithWhereWithoutPointAdjustmentsInput, Prisma.FamilyUpdateWithoutPointAdjustmentsInput>, Prisma.FamilyUncheckedUpdateWithoutPointAdjustmentsInput>
+}
+
 export type FamilyCreateNestedOneWithoutTeamMissionsInput = {
   create?: Prisma.XOR<Prisma.FamilyCreateWithoutTeamMissionsInput, Prisma.FamilyUncheckedCreateWithoutTeamMissionsInput>
   connectOrCreate?: Prisma.FamilyCreateOrConnectWithoutTeamMissionsInput
@@ -645,6 +666,7 @@ export type FamilyCreateWithoutUsersInput = {
   streakRewards?: Prisma.StreakRewardLogCreateNestedManyWithoutFamilyInput
   privileges?: Prisma.PrivilegeDefinitionCreateNestedManyWithoutFamilyInput
   privilegeRequests?: Prisma.PrivilegeRequestCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyUncheckedCreateWithoutUsersInput = {
@@ -663,6 +685,7 @@ export type FamilyUncheckedCreateWithoutUsersInput = {
   streakRewards?: Prisma.StreakRewardLogUncheckedCreateNestedManyWithoutFamilyInput
   privileges?: Prisma.PrivilegeDefinitionUncheckedCreateNestedManyWithoutFamilyInput
   privilegeRequests?: Prisma.PrivilegeRequestUncheckedCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyCreateOrConnectWithoutUsersInput = {
@@ -697,6 +720,7 @@ export type FamilyUpdateWithoutUsersInput = {
   streakRewards?: Prisma.StreakRewardLogUpdateManyWithoutFamilyNestedInput
   privileges?: Prisma.PrivilegeDefinitionUpdateManyWithoutFamilyNestedInput
   privilegeRequests?: Prisma.PrivilegeRequestUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyUncheckedUpdateWithoutUsersInput = {
@@ -715,6 +739,7 @@ export type FamilyUncheckedUpdateWithoutUsersInput = {
   streakRewards?: Prisma.StreakRewardLogUncheckedUpdateManyWithoutFamilyNestedInput
   privileges?: Prisma.PrivilegeDefinitionUncheckedUpdateManyWithoutFamilyNestedInput
   privilegeRequests?: Prisma.PrivilegeRequestUncheckedUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyCreateWithoutTasksInput = {
@@ -733,6 +758,7 @@ export type FamilyCreateWithoutTasksInput = {
   streakRewards?: Prisma.StreakRewardLogCreateNestedManyWithoutFamilyInput
   privileges?: Prisma.PrivilegeDefinitionCreateNestedManyWithoutFamilyInput
   privilegeRequests?: Prisma.PrivilegeRequestCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyUncheckedCreateWithoutTasksInput = {
@@ -751,6 +777,7 @@ export type FamilyUncheckedCreateWithoutTasksInput = {
   streakRewards?: Prisma.StreakRewardLogUncheckedCreateNestedManyWithoutFamilyInput
   privileges?: Prisma.PrivilegeDefinitionUncheckedCreateNestedManyWithoutFamilyInput
   privilegeRequests?: Prisma.PrivilegeRequestUncheckedCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyCreateOrConnectWithoutTasksInput = {
@@ -785,6 +812,7 @@ export type FamilyUpdateWithoutTasksInput = {
   streakRewards?: Prisma.StreakRewardLogUpdateManyWithoutFamilyNestedInput
   privileges?: Prisma.PrivilegeDefinitionUpdateManyWithoutFamilyNestedInput
   privilegeRequests?: Prisma.PrivilegeRequestUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyUncheckedUpdateWithoutTasksInput = {
@@ -803,6 +831,7 @@ export type FamilyUncheckedUpdateWithoutTasksInput = {
   streakRewards?: Prisma.StreakRewardLogUncheckedUpdateManyWithoutFamilyNestedInput
   privileges?: Prisma.PrivilegeDefinitionUncheckedUpdateManyWithoutFamilyNestedInput
   privilegeRequests?: Prisma.PrivilegeRequestUncheckedUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyCreateWithoutRewardsInput = {
@@ -821,6 +850,7 @@ export type FamilyCreateWithoutRewardsInput = {
   streakRewards?: Prisma.StreakRewardLogCreateNestedManyWithoutFamilyInput
   privileges?: Prisma.PrivilegeDefinitionCreateNestedManyWithoutFamilyInput
   privilegeRequests?: Prisma.PrivilegeRequestCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyUncheckedCreateWithoutRewardsInput = {
@@ -839,6 +869,7 @@ export type FamilyUncheckedCreateWithoutRewardsInput = {
   streakRewards?: Prisma.StreakRewardLogUncheckedCreateNestedManyWithoutFamilyInput
   privileges?: Prisma.PrivilegeDefinitionUncheckedCreateNestedManyWithoutFamilyInput
   privilegeRequests?: Prisma.PrivilegeRequestUncheckedCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyCreateOrConnectWithoutRewardsInput = {
@@ -873,6 +904,7 @@ export type FamilyUpdateWithoutRewardsInput = {
   streakRewards?: Prisma.StreakRewardLogUpdateManyWithoutFamilyNestedInput
   privileges?: Prisma.PrivilegeDefinitionUpdateManyWithoutFamilyNestedInput
   privilegeRequests?: Prisma.PrivilegeRequestUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyUncheckedUpdateWithoutRewardsInput = {
@@ -891,6 +923,7 @@ export type FamilyUncheckedUpdateWithoutRewardsInput = {
   streakRewards?: Prisma.StreakRewardLogUncheckedUpdateManyWithoutFamilyNestedInput
   privileges?: Prisma.PrivilegeDefinitionUncheckedUpdateManyWithoutFamilyNestedInput
   privilegeRequests?: Prisma.PrivilegeRequestUncheckedUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyCreateWithoutStreakRewardsInput = {
@@ -909,6 +942,7 @@ export type FamilyCreateWithoutStreakRewardsInput = {
   routineTemplates?: Prisma.RoutineTemplateCreateNestedManyWithoutFamilyInput
   privileges?: Prisma.PrivilegeDefinitionCreateNestedManyWithoutFamilyInput
   privilegeRequests?: Prisma.PrivilegeRequestCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyUncheckedCreateWithoutStreakRewardsInput = {
@@ -927,6 +961,7 @@ export type FamilyUncheckedCreateWithoutStreakRewardsInput = {
   routineTemplates?: Prisma.RoutineTemplateUncheckedCreateNestedManyWithoutFamilyInput
   privileges?: Prisma.PrivilegeDefinitionUncheckedCreateNestedManyWithoutFamilyInput
   privilegeRequests?: Prisma.PrivilegeRequestUncheckedCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyCreateOrConnectWithoutStreakRewardsInput = {
@@ -961,6 +996,7 @@ export type FamilyUpdateWithoutStreakRewardsInput = {
   routineTemplates?: Prisma.RoutineTemplateUpdateManyWithoutFamilyNestedInput
   privileges?: Prisma.PrivilegeDefinitionUpdateManyWithoutFamilyNestedInput
   privilegeRequests?: Prisma.PrivilegeRequestUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyUncheckedUpdateWithoutStreakRewardsInput = {
@@ -979,6 +1015,7 @@ export type FamilyUncheckedUpdateWithoutStreakRewardsInput = {
   routineTemplates?: Prisma.RoutineTemplateUncheckedUpdateManyWithoutFamilyNestedInput
   privileges?: Prisma.PrivilegeDefinitionUncheckedUpdateManyWithoutFamilyNestedInput
   privilegeRequests?: Prisma.PrivilegeRequestUncheckedUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyCreateWithoutPrivilegesInput = {
@@ -997,6 +1034,7 @@ export type FamilyCreateWithoutPrivilegesInput = {
   routineTemplates?: Prisma.RoutineTemplateCreateNestedManyWithoutFamilyInput
   streakRewards?: Prisma.StreakRewardLogCreateNestedManyWithoutFamilyInput
   privilegeRequests?: Prisma.PrivilegeRequestCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyUncheckedCreateWithoutPrivilegesInput = {
@@ -1015,6 +1053,7 @@ export type FamilyUncheckedCreateWithoutPrivilegesInput = {
   routineTemplates?: Prisma.RoutineTemplateUncheckedCreateNestedManyWithoutFamilyInput
   streakRewards?: Prisma.StreakRewardLogUncheckedCreateNestedManyWithoutFamilyInput
   privilegeRequests?: Prisma.PrivilegeRequestUncheckedCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyCreateOrConnectWithoutPrivilegesInput = {
@@ -1049,6 +1088,7 @@ export type FamilyUpdateWithoutPrivilegesInput = {
   routineTemplates?: Prisma.RoutineTemplateUpdateManyWithoutFamilyNestedInput
   streakRewards?: Prisma.StreakRewardLogUpdateManyWithoutFamilyNestedInput
   privilegeRequests?: Prisma.PrivilegeRequestUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyUncheckedUpdateWithoutPrivilegesInput = {
@@ -1067,6 +1107,7 @@ export type FamilyUncheckedUpdateWithoutPrivilegesInput = {
   routineTemplates?: Prisma.RoutineTemplateUncheckedUpdateManyWithoutFamilyNestedInput
   streakRewards?: Prisma.StreakRewardLogUncheckedUpdateManyWithoutFamilyNestedInput
   privilegeRequests?: Prisma.PrivilegeRequestUncheckedUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyCreateWithoutPrivilegeRequestsInput = {
@@ -1085,6 +1126,7 @@ export type FamilyCreateWithoutPrivilegeRequestsInput = {
   routineTemplates?: Prisma.RoutineTemplateCreateNestedManyWithoutFamilyInput
   streakRewards?: Prisma.StreakRewardLogCreateNestedManyWithoutFamilyInput
   privileges?: Prisma.PrivilegeDefinitionCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyUncheckedCreateWithoutPrivilegeRequestsInput = {
@@ -1103,6 +1145,7 @@ export type FamilyUncheckedCreateWithoutPrivilegeRequestsInput = {
   routineTemplates?: Prisma.RoutineTemplateUncheckedCreateNestedManyWithoutFamilyInput
   streakRewards?: Prisma.StreakRewardLogUncheckedCreateNestedManyWithoutFamilyInput
   privileges?: Prisma.PrivilegeDefinitionUncheckedCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyCreateOrConnectWithoutPrivilegeRequestsInput = {
@@ -1137,6 +1180,7 @@ export type FamilyUpdateWithoutPrivilegeRequestsInput = {
   routineTemplates?: Prisma.RoutineTemplateUpdateManyWithoutFamilyNestedInput
   streakRewards?: Prisma.StreakRewardLogUpdateManyWithoutFamilyNestedInput
   privileges?: Prisma.PrivilegeDefinitionUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyUncheckedUpdateWithoutPrivilegeRequestsInput = {
@@ -1155,6 +1199,99 @@ export type FamilyUncheckedUpdateWithoutPrivilegeRequestsInput = {
   routineTemplates?: Prisma.RoutineTemplateUncheckedUpdateManyWithoutFamilyNestedInput
   streakRewards?: Prisma.StreakRewardLogUncheckedUpdateManyWithoutFamilyNestedInput
   privileges?: Prisma.PrivilegeDefinitionUncheckedUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedUpdateManyWithoutFamilyNestedInput
+}
+
+export type FamilyCreateWithoutPointAdjustmentsInput = {
+  id?: string
+  name: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  dailyStreakReward?: number
+  weeklyStreakReward?: number
+  monthlyStreakReward?: number
+  yearlyStreakReward?: number
+  users?: Prisma.UserCreateNestedManyWithoutFamilyInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutFamilyInput
+  rewards?: Prisma.RewardDefinitionCreateNestedManyWithoutFamilyInput
+  teamMissions?: Prisma.TeamMissionCreateNestedManyWithoutFamilyInput
+  routineTemplates?: Prisma.RoutineTemplateCreateNestedManyWithoutFamilyInput
+  streakRewards?: Prisma.StreakRewardLogCreateNestedManyWithoutFamilyInput
+  privileges?: Prisma.PrivilegeDefinitionCreateNestedManyWithoutFamilyInput
+  privilegeRequests?: Prisma.PrivilegeRequestCreateNestedManyWithoutFamilyInput
+}
+
+export type FamilyUncheckedCreateWithoutPointAdjustmentsInput = {
+  id?: string
+  name: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  dailyStreakReward?: number
+  weeklyStreakReward?: number
+  monthlyStreakReward?: number
+  yearlyStreakReward?: number
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutFamilyInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutFamilyInput
+  rewards?: Prisma.RewardDefinitionUncheckedCreateNestedManyWithoutFamilyInput
+  teamMissions?: Prisma.TeamMissionUncheckedCreateNestedManyWithoutFamilyInput
+  routineTemplates?: Prisma.RoutineTemplateUncheckedCreateNestedManyWithoutFamilyInput
+  streakRewards?: Prisma.StreakRewardLogUncheckedCreateNestedManyWithoutFamilyInput
+  privileges?: Prisma.PrivilegeDefinitionUncheckedCreateNestedManyWithoutFamilyInput
+  privilegeRequests?: Prisma.PrivilegeRequestUncheckedCreateNestedManyWithoutFamilyInput
+}
+
+export type FamilyCreateOrConnectWithoutPointAdjustmentsInput = {
+  where: Prisma.FamilyWhereUniqueInput
+  create: Prisma.XOR<Prisma.FamilyCreateWithoutPointAdjustmentsInput, Prisma.FamilyUncheckedCreateWithoutPointAdjustmentsInput>
+}
+
+export type FamilyUpsertWithoutPointAdjustmentsInput = {
+  update: Prisma.XOR<Prisma.FamilyUpdateWithoutPointAdjustmentsInput, Prisma.FamilyUncheckedUpdateWithoutPointAdjustmentsInput>
+  create: Prisma.XOR<Prisma.FamilyCreateWithoutPointAdjustmentsInput, Prisma.FamilyUncheckedCreateWithoutPointAdjustmentsInput>
+  where?: Prisma.FamilyWhereInput
+}
+
+export type FamilyUpdateToOneWithWhereWithoutPointAdjustmentsInput = {
+  where?: Prisma.FamilyWhereInput
+  data: Prisma.XOR<Prisma.FamilyUpdateWithoutPointAdjustmentsInput, Prisma.FamilyUncheckedUpdateWithoutPointAdjustmentsInput>
+}
+
+export type FamilyUpdateWithoutPointAdjustmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dailyStreakReward?: Prisma.IntFieldUpdateOperationsInput | number
+  weeklyStreakReward?: Prisma.IntFieldUpdateOperationsInput | number
+  monthlyStreakReward?: Prisma.IntFieldUpdateOperationsInput | number
+  yearlyStreakReward?: Prisma.IntFieldUpdateOperationsInput | number
+  users?: Prisma.UserUpdateManyWithoutFamilyNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutFamilyNestedInput
+  rewards?: Prisma.RewardDefinitionUpdateManyWithoutFamilyNestedInput
+  teamMissions?: Prisma.TeamMissionUpdateManyWithoutFamilyNestedInput
+  routineTemplates?: Prisma.RoutineTemplateUpdateManyWithoutFamilyNestedInput
+  streakRewards?: Prisma.StreakRewardLogUpdateManyWithoutFamilyNestedInput
+  privileges?: Prisma.PrivilegeDefinitionUpdateManyWithoutFamilyNestedInput
+  privilegeRequests?: Prisma.PrivilegeRequestUpdateManyWithoutFamilyNestedInput
+}
+
+export type FamilyUncheckedUpdateWithoutPointAdjustmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dailyStreakReward?: Prisma.IntFieldUpdateOperationsInput | number
+  weeklyStreakReward?: Prisma.IntFieldUpdateOperationsInput | number
+  monthlyStreakReward?: Prisma.IntFieldUpdateOperationsInput | number
+  yearlyStreakReward?: Prisma.IntFieldUpdateOperationsInput | number
+  users?: Prisma.UserUncheckedUpdateManyWithoutFamilyNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutFamilyNestedInput
+  rewards?: Prisma.RewardDefinitionUncheckedUpdateManyWithoutFamilyNestedInput
+  teamMissions?: Prisma.TeamMissionUncheckedUpdateManyWithoutFamilyNestedInput
+  routineTemplates?: Prisma.RoutineTemplateUncheckedUpdateManyWithoutFamilyNestedInput
+  streakRewards?: Prisma.StreakRewardLogUncheckedUpdateManyWithoutFamilyNestedInput
+  privileges?: Prisma.PrivilegeDefinitionUncheckedUpdateManyWithoutFamilyNestedInput
+  privilegeRequests?: Prisma.PrivilegeRequestUncheckedUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyCreateWithoutTeamMissionsInput = {
@@ -1173,6 +1310,7 @@ export type FamilyCreateWithoutTeamMissionsInput = {
   streakRewards?: Prisma.StreakRewardLogCreateNestedManyWithoutFamilyInput
   privileges?: Prisma.PrivilegeDefinitionCreateNestedManyWithoutFamilyInput
   privilegeRequests?: Prisma.PrivilegeRequestCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyUncheckedCreateWithoutTeamMissionsInput = {
@@ -1191,6 +1329,7 @@ export type FamilyUncheckedCreateWithoutTeamMissionsInput = {
   streakRewards?: Prisma.StreakRewardLogUncheckedCreateNestedManyWithoutFamilyInput
   privileges?: Prisma.PrivilegeDefinitionUncheckedCreateNestedManyWithoutFamilyInput
   privilegeRequests?: Prisma.PrivilegeRequestUncheckedCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyCreateOrConnectWithoutTeamMissionsInput = {
@@ -1225,6 +1364,7 @@ export type FamilyUpdateWithoutTeamMissionsInput = {
   streakRewards?: Prisma.StreakRewardLogUpdateManyWithoutFamilyNestedInput
   privileges?: Prisma.PrivilegeDefinitionUpdateManyWithoutFamilyNestedInput
   privilegeRequests?: Prisma.PrivilegeRequestUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyUncheckedUpdateWithoutTeamMissionsInput = {
@@ -1243,6 +1383,7 @@ export type FamilyUncheckedUpdateWithoutTeamMissionsInput = {
   streakRewards?: Prisma.StreakRewardLogUncheckedUpdateManyWithoutFamilyNestedInput
   privileges?: Prisma.PrivilegeDefinitionUncheckedUpdateManyWithoutFamilyNestedInput
   privilegeRequests?: Prisma.PrivilegeRequestUncheckedUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyCreateWithoutRoutineTemplatesInput = {
@@ -1261,6 +1402,7 @@ export type FamilyCreateWithoutRoutineTemplatesInput = {
   streakRewards?: Prisma.StreakRewardLogCreateNestedManyWithoutFamilyInput
   privileges?: Prisma.PrivilegeDefinitionCreateNestedManyWithoutFamilyInput
   privilegeRequests?: Prisma.PrivilegeRequestCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyUncheckedCreateWithoutRoutineTemplatesInput = {
@@ -1279,6 +1421,7 @@ export type FamilyUncheckedCreateWithoutRoutineTemplatesInput = {
   streakRewards?: Prisma.StreakRewardLogUncheckedCreateNestedManyWithoutFamilyInput
   privileges?: Prisma.PrivilegeDefinitionUncheckedCreateNestedManyWithoutFamilyInput
   privilegeRequests?: Prisma.PrivilegeRequestUncheckedCreateNestedManyWithoutFamilyInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyCreateOrConnectWithoutRoutineTemplatesInput = {
@@ -1313,6 +1456,7 @@ export type FamilyUpdateWithoutRoutineTemplatesInput = {
   streakRewards?: Prisma.StreakRewardLogUpdateManyWithoutFamilyNestedInput
   privileges?: Prisma.PrivilegeDefinitionUpdateManyWithoutFamilyNestedInput
   privilegeRequests?: Prisma.PrivilegeRequestUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyUncheckedUpdateWithoutRoutineTemplatesInput = {
@@ -1331,6 +1475,7 @@ export type FamilyUncheckedUpdateWithoutRoutineTemplatesInput = {
   streakRewards?: Prisma.StreakRewardLogUncheckedUpdateManyWithoutFamilyNestedInput
   privileges?: Prisma.PrivilegeDefinitionUncheckedUpdateManyWithoutFamilyNestedInput
   privilegeRequests?: Prisma.PrivilegeRequestUncheckedUpdateManyWithoutFamilyNestedInput
+  pointAdjustments?: Prisma.PointAdjustmentUncheckedUpdateManyWithoutFamilyNestedInput
 }
 
 
@@ -1347,6 +1492,7 @@ export type FamilyCountOutputType = {
   streakRewards: number
   privileges: number
   privilegeRequests: number
+  pointAdjustments: number
 }
 
 export type FamilyCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1358,6 +1504,7 @@ export type FamilyCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   streakRewards?: boolean | FamilyCountOutputTypeCountStreakRewardsArgs
   privileges?: boolean | FamilyCountOutputTypeCountPrivilegesArgs
   privilegeRequests?: boolean | FamilyCountOutputTypeCountPrivilegeRequestsArgs
+  pointAdjustments?: boolean | FamilyCountOutputTypeCountPointAdjustmentsArgs
 }
 
 /**
@@ -1426,6 +1573,13 @@ export type FamilyCountOutputTypeCountPrivilegeRequestsArgs<ExtArgs extends runt
   where?: Prisma.PrivilegeRequestWhereInput
 }
 
+/**
+ * FamilyCountOutputType without action
+ */
+export type FamilyCountOutputTypeCountPointAdjustmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PointAdjustmentWhereInput
+}
+
 
 export type FamilySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1444,6 +1598,7 @@ export type FamilySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   streakRewards?: boolean | Prisma.Family$streakRewardsArgs<ExtArgs>
   privileges?: boolean | Prisma.Family$privilegesArgs<ExtArgs>
   privilegeRequests?: boolean | Prisma.Family$privilegeRequestsArgs<ExtArgs>
+  pointAdjustments?: boolean | Prisma.Family$pointAdjustmentsArgs<ExtArgs>
   _count?: boolean | Prisma.FamilyCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["family"]>
 
@@ -1490,6 +1645,7 @@ export type FamilyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   streakRewards?: boolean | Prisma.Family$streakRewardsArgs<ExtArgs>
   privileges?: boolean | Prisma.Family$privilegesArgs<ExtArgs>
   privilegeRequests?: boolean | Prisma.Family$privilegeRequestsArgs<ExtArgs>
+  pointAdjustments?: boolean | Prisma.Family$pointAdjustmentsArgs<ExtArgs>
   _count?: boolean | Prisma.FamilyCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type FamilyIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1506,6 +1662,7 @@ export type $FamilyPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     streakRewards: Prisma.$StreakRewardLogPayload<ExtArgs>[]
     privileges: Prisma.$PrivilegeDefinitionPayload<ExtArgs>[]
     privilegeRequests: Prisma.$PrivilegeRequestPayload<ExtArgs>[]
+    pointAdjustments: Prisma.$PointAdjustmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1918,6 +2075,7 @@ export interface Prisma__FamilyClient<T, Null = never, ExtArgs extends runtime.T
   streakRewards<T extends Prisma.Family$streakRewardsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Family$streakRewardsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StreakRewardLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   privileges<T extends Prisma.Family$privilegesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Family$privilegesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PrivilegeDefinitionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   privilegeRequests<T extends Prisma.Family$privilegeRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Family$privilegeRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PrivilegeRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pointAdjustments<T extends Prisma.Family$pointAdjustmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Family$pointAdjustmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PointAdjustmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2530,6 +2688,30 @@ export type Family$privilegeRequestsArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.PrivilegeRequestScalarFieldEnum | Prisma.PrivilegeRequestScalarFieldEnum[]
+}
+
+/**
+ * Family.pointAdjustments
+ */
+export type Family$pointAdjustmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PointAdjustment
+   */
+  select?: Prisma.PointAdjustmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PointAdjustment
+   */
+  omit?: Prisma.PointAdjustmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PointAdjustmentInclude<ExtArgs> | null
+  where?: Prisma.PointAdjustmentWhereInput
+  orderBy?: Prisma.PointAdjustmentOrderByWithRelationInput | Prisma.PointAdjustmentOrderByWithRelationInput[]
+  cursor?: Prisma.PointAdjustmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PointAdjustmentScalarFieldEnum | Prisma.PointAdjustmentScalarFieldEnum[]
 }
 
 /**

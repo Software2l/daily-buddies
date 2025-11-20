@@ -399,6 +399,7 @@ export const ModelName = {
   StreakRewardLog: 'StreakRewardLog',
   PrivilegeDefinition: 'PrivilegeDefinition',
   PrivilegeRequest: 'PrivilegeRequest',
+  PointAdjustment: 'PointAdjustment',
   MoodEntry: 'MoodEntry',
   KindNote: 'KindNote',
   TeamMission: 'TeamMission',
@@ -423,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "family" | "user" | "task" | "taskCompletion" | "rewardDefinition" | "rewardRedemption" | "streakRewardLog" | "privilegeDefinition" | "privilegeRequest" | "moodEntry" | "kindNote" | "teamMission" | "teamParticipant" | "missionReward" | "routineTemplate" | "routineTemplateItem" | "routineAssignment" | "taskAssignment"
+    modelProps: "family" | "user" | "task" | "taskCompletion" | "rewardDefinition" | "rewardRedemption" | "streakRewardLog" | "privilegeDefinition" | "privilegeRequest" | "pointAdjustment" | "moodEntry" | "kindNote" | "teamMission" | "teamParticipant" | "missionReward" | "routineTemplate" | "routineTemplateItem" | "routineAssignment" | "taskAssignment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1090,6 +1091,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PrivilegeRequestCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PrivilegeRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    PointAdjustment: {
+      payload: Prisma.$PointAdjustmentPayload<ExtArgs>
+      fields: Prisma.PointAdjustmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PointAdjustmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointAdjustmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PointAdjustmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointAdjustmentPayload>
+        }
+        findFirst: {
+          args: Prisma.PointAdjustmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointAdjustmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PointAdjustmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointAdjustmentPayload>
+        }
+        findMany: {
+          args: Prisma.PointAdjustmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointAdjustmentPayload>[]
+        }
+        create: {
+          args: Prisma.PointAdjustmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointAdjustmentPayload>
+        }
+        createMany: {
+          args: Prisma.PointAdjustmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PointAdjustmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointAdjustmentPayload>[]
+        }
+        delete: {
+          args: Prisma.PointAdjustmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointAdjustmentPayload>
+        }
+        update: {
+          args: Prisma.PointAdjustmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointAdjustmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.PointAdjustmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PointAdjustmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PointAdjustmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointAdjustmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.PointAdjustmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PointAdjustmentPayload>
+        }
+        aggregate: {
+          args: Prisma.PointAdjustmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePointAdjustment>
+        }
+        groupBy: {
+          args: Prisma.PointAdjustmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PointAdjustmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PointAdjustmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PointAdjustmentCountAggregateOutputType> | number
         }
       }
     }
@@ -1925,6 +2000,20 @@ export const PrivilegeRequestScalarFieldEnum = {
 export type PrivilegeRequestScalarFieldEnum = (typeof PrivilegeRequestScalarFieldEnum)[keyof typeof PrivilegeRequestScalarFieldEnum]
 
 
+export const PointAdjustmentScalarFieldEnum = {
+  id: 'id',
+  familyId: 'familyId',
+  childId: 'childId',
+  createdById: 'createdById',
+  points: 'points',
+  type: 'type',
+  note: 'note',
+  createdAt: 'createdAt'
+} as const
+
+export type PointAdjustmentScalarFieldEnum = (typeof PointAdjustmentScalarFieldEnum)[keyof typeof PointAdjustmentScalarFieldEnum]
+
+
 export const MoodEntryScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -2162,6 +2251,13 @@ export type EnumPrivilegeRequestStatusFieldRefInput<$PrismaModel> = FieldRefInpu
 
 
 /**
+ * Reference to a field of type 'PointAdjustmentType'
+ */
+export type EnumPointAdjustmentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PointAdjustmentType'>
+    
+
+
+/**
  * Reference to a field of type 'MoodLevel'
  */
 export type EnumMoodLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MoodLevel'>
@@ -2277,6 +2373,7 @@ export type GlobalOmitConfig = {
   streakRewardLog?: Prisma.StreakRewardLogOmit
   privilegeDefinition?: Prisma.PrivilegeDefinitionOmit
   privilegeRequest?: Prisma.PrivilegeRequestOmit
+  pointAdjustment?: Prisma.PointAdjustmentOmit
   moodEntry?: Prisma.MoodEntryOmit
   kindNote?: Prisma.KindNoteOmit
   teamMission?: Prisma.TeamMissionOmit

@@ -20,6 +20,8 @@ import {
 	fetchPrivilegeRequests,
 	fetchMyPrivilegeRequests,
 	PrivilegeRequestEntry,
+	fetchPointEntries,
+	PointEntry,
 } from "../../src/services/api";
 
 type ProfileShape = ReturnType<typeof useAuth>["profile"];
@@ -154,6 +156,12 @@ const ParentHome = ({
 		queryFn: () => fetchTasks(token),
 		staleTime: 30_000,
 	});
+	const pointEntriesQuery = useQuery({
+		queryKey: ["home-parent-point-entries", token],
+		queryFn: () => fetchPointEntries(token, { scope: "today", limit: 5 }),
+		enabled: !!token,
+		staleTime: 15_000,
+	});
 	const privilegeQuery = useQuery({
 		queryKey: ["home-parent-privileges", token],
 		queryFn: () => fetchPrivilegeRequests(token),
@@ -161,6 +169,7 @@ const ParentHome = ({
 	});
 
 	const tasks = (tasksQuery.data as ParentTaskSummary[]) ?? [];
+	const todayPointEntries = (pointEntriesQuery.data as PointEntry[]) ?? [];
 	const privilegeRequests = privilegeQuery.data ?? [];
 	const pendingPrivileges = privilegeRequests
 		.filter(request => request.status === "PENDING")
@@ -287,7 +296,6 @@ const ParentHome = ({
 					<View style={styles.cardHeader}>
 						<Text style={styles.sectionTitle}>Privileges</Text>
 						<TouchableOpacity
-							style={styles.linkButton}
 							onPress={() => router.push("/family/privileges")}>
 							<Text style={styles.linkText}>Manage</Text>
 						</TouchableOpacity>
@@ -356,6 +364,46 @@ const ParentHome = ({
 					)}
 				</View>
 
+				{todayPointEntries.length > 0 && (
+					<View style={styles.card}>
+						<View style={styles.cardHeader}>
+							<Text style={styles.sectionTitle}>Gifts & Penalties</Text>
+							<TouchableOpacity onPress={() => router.push("/points")}>
+								<Text style={styles.linkText}>Manage</Text>
+							</TouchableOpacity>
+						</View>
+						{todayPointEntries.map(entry => (
+							<View key={entry.id} style={styles.adjustmentRow}>
+								<View
+									style={[
+										styles.avatarDot,
+										{ backgroundColor: getToneColor(entry.child?.avatarTone) },
+									]}
+								/>
+								<View style={styles.adjustmentInfo}>
+									<Text style={styles.assignmentTask}>
+										{entry.child?.name ?? "Child"}
+									</Text>
+									<Text
+										style={[
+											styles.adjustmentAmount,
+											entry.points >= 0
+												? styles.giftText
+												: styles.penaltyText,
+										]}
+									>
+										{entry.points >= 0 ? "+" : ""}
+										{entry.points} seeds
+									</Text>
+									{entry.note ? (
+										<Text style={styles.lightText}>{entry.note}</Text>
+									) : null}
+								</View>
+							</View>
+						))}
+					</View>
+				)}
+
 				<View style={styles.actions}>
 					<TouchableOpacity
 						style={styles.primaryButton}
@@ -365,7 +413,7 @@ const ParentHome = ({
 					<TouchableOpacity
 						style={styles.ghostButton}
 						onPress={() => router.push("/family")}>
-						<Text style={styles.ghostText}>Family Overview</Text>
+						<Text style={styles.ghostText}>Family Center</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
 						style={styles.ghostButton}
@@ -400,6 +448,12 @@ const ChildHome = ({
 		queryFn: () => fetchFamilyStreakSettings(token),
 		enabled: !!token,
 	});
+	const childPointEntriesQuery = useQuery({
+		queryKey: ["home-child-point-entries", token],
+		queryFn: () => fetchPointEntries(token, { scope: "today", limit: 5 }),
+		enabled: !!token,
+		staleTime: 15_000,
+	});
 	const privilegeRequestsQuery = useQuery({
 		queryKey: ["home-child-privileges", token],
 		queryFn: () => fetchMyPrivilegeRequests(token),
@@ -430,6 +484,7 @@ const ChildHome = ({
 	});
 
 	const tasks = (tasksQuery.data as ChildTaskSummary[]) ?? [];
+	const childPointEntries = (childPointEntriesQuery.data as PointEntry[]) ?? [];
 	const manualTasks = tasks.filter(task => !task.routineName);
 	const routineGroups = useMemo(() => {
 		const groups: Record<
@@ -523,17 +578,39 @@ const ChildHome = ({
 						</Text>
 					</View>
 
+					{childPointEntries.map(entry => {
+						const isGift = entry.points >= 0;
+						return (
+							<View key={entry.id} style={styles.pointEntryCard}>
+								<View style={styles.pointEntryIcon}>
+									<Text style={styles.pointEntryIconLabel}>
+										{isGift ? "😊" : "😕"}
+									</Text>
+								</View>
+								<View style={{ flex: 1 }}>
+									<Text style={styles.pointAlertAmount}>
+										{isGift ? "+" : "-"}
+										{Math.abs(entry.points)} seeds
+									</Text>
+									{entry.note ? (
+										<Text style={styles.pointAlertNote}>{entry.note}</Text>
+									) : null}
+								</View>
+							</View>
+						);
+					})}
+
 					<View style={styles.card}>
-						<View style={[styles.cardHeader, styles.cardHeaderTight]}>
-							<Text style={styles.sectionTitle}>
-								My Privileges
-							</Text>
-							<TouchableOpacity
-								onPress={() => router.push("/privileges")}>
-								<Text style={styles.linkText}>Open</Text>
-							</TouchableOpacity>
-						</View>
-						{childActiveTickets.length > 0 && (
+				<View style={[styles.cardHeader, styles.cardHeaderTight]}>
+					<Text style={styles.sectionTitle}>
+						My Privileges
+					</Text>
+					<TouchableOpacity
+						onPress={() => router.push("/privileges")}>
+						<Text style={styles.linkText}>Open</Text>
+					</TouchableOpacity>
+				</View>
+				{childActiveTickets.length > 0 && (
 							<>
 								<Text style={styles.cardLabel}>
 									Active tickets
@@ -903,6 +980,40 @@ const styles = StyleSheet.create({
 		backgroundColor: "#eef2ff",
 		gap: 6,
 	},
+	pointEntryCard: {
+		backgroundColor: "#fff",
+		borderRadius: 20,
+		padding: 16,
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 12,
+		borderWidth: 1,
+		borderColor: "#e2e8f0",
+		shadowColor: "#0f172a",
+		shadowOpacity: 0.04,
+		shadowRadius: 10,
+		shadowOffset: { width: 0, height: 6 },
+	},
+	pointEntryIcon: {
+		width: 44,
+		height: 44,
+		borderRadius: 22,
+		alignItems: "center",
+		justifyContent: "center",
+		backgroundColor: "#f1f5f9",
+	},
+	pointEntryIconLabel: {
+		fontSize: 26,
+	},
+	pointAlertAmount: {
+		fontSize: 15,
+		fontWeight: "600",
+		color: "#111827",
+	},
+	pointAlertNote: {
+		color: "#1f2937",
+		fontSize: 14,
+	},
 	seedDetail: {
 		color: "#475569",
 		fontWeight: "500",
@@ -929,6 +1040,27 @@ const styles = StyleSheet.create({
 	},
 	assignmentChild: {
 		color: "#6b7280",
+	},
+	adjustmentRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 10,
+		paddingVertical: 6,
+		borderBottomWidth: 1,
+		borderBottomColor: "#f1f5f9",
+	},
+	adjustmentInfo: {
+		flex: 1,
+		gap: 2,
+	},
+	adjustmentAmount: {
+		fontWeight: "600",
+	},
+	giftText: {
+		color: "#16a34a",
+	},
+	penaltyText: {
+		color: "#dc2626",
 	},
 	privilegeItem: {
 		paddingVertical: 8,

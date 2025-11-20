@@ -37,7 +37,7 @@ const isActiveToday = (value: unknown) => {
 };
 
 export async function calculateSeedBalance(childId: string) {
-  const [earned, missionBonus, spent, streakRewards, privilegeSpent] = await Promise.all([
+  const [earned, missionBonus, spent, streakRewards, privilegeSpent, manualAdjustments] = await Promise.all([
     prisma.taskCompletion.aggregate({
       where: { childId },
       _sum: { seedsEarned: true },
@@ -61,6 +61,10 @@ export async function calculateSeedBalance(childId: string) {
       },
       _sum: { cost: true },
     }),
+    prisma.pointAdjustment.aggregate({
+      where: { childId },
+      _sum: { points: true },
+    }),
   ]);
 
   const earnedSeeds = earned._sum.seedsEarned ?? 0;
@@ -68,8 +72,9 @@ export async function calculateSeedBalance(childId: string) {
   const spentSeeds = spent._sum.seedsSpent ?? 0;
   const streakSeeds = streakRewards._sum.seedsEarned ?? 0;
   const privilegeCost = privilegeSpent._sum.cost ?? 0;
+  const adjustmentSeeds = manualAdjustments._sum.points ?? 0;
 
-  return earnedSeeds + missionSeeds + streakSeeds - spentSeeds - privilegeCost;
+  return earnedSeeds + missionSeeds + streakSeeds + adjustmentSeeds - spentSeeds - privilegeCost;
 }
 
 export async function calculateChildStreak(childId: string) {

@@ -51,7 +51,7 @@ export default function FamilyScreen() {
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Text style={styles.backLabel}>← Back</Text>
           </TouchableOpacity>
-          <Text style={styles.header}>Family Overview 🌼</Text>
+          <Text style={styles.header}>Family Center 🌼</Text>
         </View>
 
           <Text style={styles.subtitle}>Accounts and progress at a glance.</Text>
@@ -64,7 +64,7 @@ export default function FamilyScreen() {
             style={styles.primaryButton}
             onPress={() => router.push("/family/manage/parents")}
           >
-            <Text style={styles.primaryButtonText}>Manage Family Accounts</Text>
+            <Text style={styles.primaryButtonText}>Manage Accounts</Text>
           </TouchableOpacity>
 
           {profile?.role === "PARENT" && (
@@ -79,7 +79,13 @@ export default function FamilyScreen() {
                 style={styles.ghostButton}
                 onPress={() => router.push("/family/privileges")}
               >
-                <Text style={styles.ghostText}>Privilege Center</Text>
+                <Text style={styles.ghostText}>Manage Privileges</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.ghostButton}
+                onPress={() => router.push("/points")}
+              >
+                <Text style={styles.ghostText}>Gifts & Penalties</Text>
               </TouchableOpacity>
             </>
           )}

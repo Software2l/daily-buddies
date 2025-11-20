@@ -63,6 +63,11 @@ export type PrivilegeDefinition = Prisma.PrivilegeDefinitionModel
  */
 export type PrivilegeRequest = Prisma.PrivilegeRequestModel
 /**
+ * Model PointAdjustment
+ * 
+ */
+export type PointAdjustment = Prisma.PointAdjustmentModel
+/**
  * Model MoodEntry
  * 
  */

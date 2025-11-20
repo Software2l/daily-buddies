@@ -108,7 +108,7 @@ export default function FamilyPrivilegesScreen() {
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Text style={styles.backLabel}>← Back</Text>
           </TouchableOpacity>
-          <Text style={styles.header}>Privilege Center 🌿</Text>
+          <Text style={styles.header}>Manage Privilege 🌿</Text>
         </View>
         <Text style={styles.subtitle}>Design experiences, approve requests, and tidy up tickets.</Text>
 

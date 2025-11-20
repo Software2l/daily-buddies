@@ -230,6 +230,25 @@ const mapPrivilegeRequest = (entry: PrivilegeRequestApiResponse): PrivilegeReque
   };
 };
 
+export type PointEntry = {
+  id: string;
+  type: "GIFT" | "PENALTY";
+  points: number;
+  amount: number;
+  note?: string | null;
+  createdAt: string;
+  child?: {
+    id: string;
+    name: string;
+    username?: string;
+    avatarTone?: string | null;
+  };
+  createdBy?: {
+    id: string;
+    name: string;
+  };
+};
+
 export async function fetchFamilyStreakSettings(token: string) {
   return request<{
     dailyStreakReward: number;
@@ -339,6 +358,57 @@ export async function terminatePrivilegeRequest(token: string, requestId: string
     body: payload,
   });
   return mapPrivilegeRequest(entry);
+}
+
+type PointQueryParams = {
+  scope?: "today" | "recent";
+  limit?: number;
+  childId?: string;
+};
+
+export async function fetchPointEntries(token: string, params: PointQueryParams = {}) {
+  const query = new URLSearchParams();
+  if (params.scope) {
+    query.set("scope", params.scope);
+  }
+  if (params.limit) {
+    query.set("limit", String(params.limit));
+  }
+  if (params.childId) {
+    query.set("childId", params.childId);
+  }
+
+  const search = query.toString();
+  return request<PointEntry[]>(`/points${search ? `?${search}` : ""}`, {
+    method: "GET",
+    token,
+  });
+}
+
+export async function fetchPointHistory(token: string, params: { childId?: string; limit?: number } = {}) {
+  const query = new URLSearchParams();
+  if (params.childId) {
+    query.set("childId", params.childId);
+  }
+  if (params.limit) {
+    query.set("limit", String(params.limit));
+  }
+  const search = query.toString();
+  return request<PointEntry[]>(`/points/history${search ? `?${search}` : ""}`, {
+    method: "GET",
+    token,
+  });
+}
+
+export async function createPointEntry(
+  token: string,
+  payload: { childId: string; type: "GIFT" | "PENALTY"; amount: number; note?: string },
+) {
+  return request<PointEntry>(`/points`, {
+    method: "POST",
+    token,
+    body: payload,
+  });
 }
 
 export type ChildTaskSummary = {

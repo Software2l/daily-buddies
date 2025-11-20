@@ -8,6 +8,7 @@ import noteRoutes from "./notes";
 import missionRoutes from "./missions";
 import dashboardRoutes from "./dashboard";
 import routineRoutes from "./routines";
+import pointRoutes from "./points";
 
 const router = Router();
 
@@ -19,6 +20,7 @@ router.use("/auth", authRoutes);
 router.use("/tasks", taskRoutes);
 router.use("/rewards", rewardRoutes);
 router.use("/privileges", privilegeRoutes);
+router.use("/points", pointRoutes);
 router.use("/moods", moodRoutes);
 router.use("/notes", noteRoutes);
 router.use("/missions", missionRoutes);

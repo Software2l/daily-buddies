@@ -11,6 +11,7 @@ import {
   MoodLevel,
   TeamMissionStatus,
   PrivilegeRequestStatus,
+  PointAdjustmentType,
 } from "../src/generated/prisma/client";
 
 const prisma = new PrismaClient();
@@ -39,6 +40,7 @@ async function resetData() {
     prisma.rewardDefinition.deleteMany(),
     prisma.privilegeRequest.deleteMany(),
     prisma.privilegeDefinition.deleteMany(),
+    prisma.pointAdjustment.deleteMany(),
     prisma.taskCompletion.deleteMany(),
     prisma.task.deleteMany(),
     prisma.streakRewardLog.deleteMany(),
@@ -410,6 +412,27 @@ async function main() {
       note: "Expired screen time ticket",
       resolvedAt: new Date(),
     },
+  });
+
+  await prisma.pointAdjustment.createMany({
+    data: [
+      {
+        familyId: family.id,
+        childId: luna.id,
+        createdById: parent.id,
+        type: PointAdjustmentType.GIFT,
+        points: 5,
+        note: "Birthday bonus",
+      },
+      {
+        familyId: family.id,
+        childId: theo.id,
+        createdById: parent.id,
+        type: PointAdjustmentType.PENALTY,
+        points: -3,
+        note: "Marked task complete without doing it",
+      },
+    ],
   });
 
   const rewards = await prisma.rewardDefinition.createMany({

@@ -314,6 +314,23 @@ export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDateTimeNullableFilter<$PrismaModel>
 }
 
+export type EnumPointAdjustmentTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PointAdjustmentType | Prisma.EnumPointAdjustmentTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PointAdjustmentType[]
+  notIn?: $Enums.PointAdjustmentType[]
+  not?: Prisma.NestedEnumPointAdjustmentTypeFilter<$PrismaModel> | $Enums.PointAdjustmentType
+}
+
+export type EnumPointAdjustmentTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PointAdjustmentType | Prisma.EnumPointAdjustmentTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PointAdjustmentType[]
+  notIn?: $Enums.PointAdjustmentType[]
+  not?: Prisma.NestedEnumPointAdjustmentTypeWithAggregatesFilter<$PrismaModel> | $Enums.PointAdjustmentType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPointAdjustmentTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPointAdjustmentTypeFilter<$PrismaModel>
+}
+
 export type EnumMoodLevelFilter<$PrismaModel = never> = {
   equals?: $Enums.MoodLevel | Prisma.EnumMoodLevelFieldRefInput<$PrismaModel>
   in?: $Enums.MoodLevel[]
@@ -641,6 +658,23 @@ export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedDateTimeNullableFilter<$PrismaModel>
   _max?: Prisma.NestedDateTimeNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumPointAdjustmentTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PointAdjustmentType | Prisma.EnumPointAdjustmentTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PointAdjustmentType[]
+  notIn?: $Enums.PointAdjustmentType[]
+  not?: Prisma.NestedEnumPointAdjustmentTypeFilter<$PrismaModel> | $Enums.PointAdjustmentType
+}
+
+export type NestedEnumPointAdjustmentTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PointAdjustmentType | Prisma.EnumPointAdjustmentTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PointAdjustmentType[]
+  notIn?: $Enums.PointAdjustmentType[]
+  not?: Prisma.NestedEnumPointAdjustmentTypeWithAggregatesFilter<$PrismaModel> | $Enums.PointAdjustmentType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPointAdjustmentTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPointAdjustmentTypeFilter<$PrismaModel>
 }
 
 export type NestedEnumMoodLevelFilter<$PrismaModel = never> = {

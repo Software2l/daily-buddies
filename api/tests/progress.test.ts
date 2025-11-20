@@ -26,6 +26,9 @@ const prismaMock = vi.hoisted(() => ({
   privilegeRequest: {
     aggregate: vi.fn(),
   },
+  pointAdjustment: {
+    aggregate: vi.fn(),
+  },
 }));
 
 vi.mock("../src/prisma", async () => {
@@ -45,12 +48,14 @@ const resetMocks = () => {
   prismaMock.streakRewardLog.findFirst.mockReset();
   prismaMock.streakRewardLog.create.mockReset();
   prismaMock.privilegeRequest.aggregate.mockReset();
+  prismaMock.pointAdjustment.aggregate.mockReset();
 };
 
 describe("progress service helpers", () => {
   beforeEach(() => {
     resetMocks();
     prismaMock.privilegeRequest.aggregate.mockResolvedValue({ _sum: { cost: 0 } });
+    prismaMock.pointAdjustment.aggregate.mockResolvedValue({ _sum: { points: 0 } });
     vi.useRealTimers();
   });
 
@@ -64,10 +69,11 @@ describe("progress service helpers", () => {
     prismaMock.rewardRedemption.aggregate.mockResolvedValue({ _sum: { seedsSpent: 5 } });
     prismaMock.streakRewardLog.aggregate.mockResolvedValue({ _sum: { seedsEarned: 2 } });
     prismaMock.privilegeRequest.aggregate.mockResolvedValue({ _sum: { cost: 3 } });
+    prismaMock.pointAdjustment.aggregate.mockResolvedValue({ _sum: { points: 2 } });
 
     const balance = await calculateSeedBalance("child-123");
 
-    expect(balance).toBe(6);
+    expect(balance).toBe(8);
     expect(prismaMock.taskCompletion.aggregate).toHaveBeenCalledWith({
       where: { childId: "child-123" },
       _sum: { seedsEarned: true },

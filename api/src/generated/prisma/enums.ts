@@ -75,6 +75,14 @@ export const PrivilegeRequestStatus = {
 export type PrivilegeRequestStatus = (typeof PrivilegeRequestStatus)[keyof typeof PrivilegeRequestStatus]
 
 
+export const PointAdjustmentType = {
+  GIFT: 'GIFT',
+  PENALTY: 'PENALTY'
+} as const
+
+export type PointAdjustmentType = (typeof PointAdjustmentType)[keyof typeof PointAdjustmentType]
+
+
 export const TeamMissionStatus = {
   ACTIVE: 'ACTIVE',
   COMPLETED: 'COMPLETED',
