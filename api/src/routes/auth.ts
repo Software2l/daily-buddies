@@ -562,8 +562,6 @@ router.get(
     const startOfDay = startOfDayUTC();
     const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
 
-    const starterTaskTitles = STARTER_TASKS.map((task) => task.title);
-
     const [assignmentCounts, completedToday, parentTaskCounts] = await Promise.all([
       childIds.length
         ? prisma.taskAssignment.groupBy({
@@ -590,10 +588,7 @@ router.get(
         ? prisma.task.groupBy({
             by: ["createdById"],
             _count: { createdById: true },
-            where: {
-              createdById: { in: parentIds },
-              title: { notIn: starterTaskTitles },
-            },
+            where: { createdById: { in: parentIds } },
           })
         : [],
     ]);
