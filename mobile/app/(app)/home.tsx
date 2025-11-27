@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
 	Animated,
+	RefreshControl,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -167,6 +168,20 @@ const ParentHome = ({
 		queryFn: () => fetchPrivilegeRequests(token),
 		staleTime: 30_000,
 	});
+	const [refreshing, setRefreshing] = useState(false);
+
+	const handleRefresh = async () => {
+		setRefreshing(true);
+		try {
+			await Promise.all([
+				tasksQuery.refetch(),
+				pointEntriesQuery.refetch(),
+				privilegeQuery.refetch(),
+			]);
+		} finally {
+			setRefreshing(false);
+		}
+	};
 
 	const tasks = (tasksQuery.data as ParentTaskSummary[]) ?? [];
 	const todayPointEntries = (pointEntriesQuery.data as PointEntry[]) ?? [];
@@ -177,6 +192,7 @@ const ParentHome = ({
 	const activePrivilegeTickets = privilegeRequests
 		.filter(request => request.status === "APPROVED")
 		.slice(0, 3);
+	const hasPrivilegeData = privilegeRequests.length > 0;
 
 	const pendingAssignments = tasks.flatMap(task =>
 		task.assignments
@@ -201,7 +217,15 @@ const ParentHome = ({
 
 	return (
 		<SafeAreaView style={styles.safe}>
-			<ScrollView contentContainerStyle={styles.container}>
+			<ScrollView
+				contentContainerStyle={styles.container}
+				refreshControl={
+					<RefreshControl
+						refreshing={refreshing}
+						onRefresh={handleRefresh}
+						tintColor="#6c63ff"
+					/>
+				}>
 				<Text style={styles.greeting}>
 					Hi {profile?.name ?? "there"} 👋
 				</Text>
@@ -223,37 +247,35 @@ const ParentHome = ({
 							All set! No tasks pending right now.
 						</Text>
 					) : (
-						pendingAssignments
-							.slice(0, 4)
-							.map((assignment, index) => (
+						pendingAssignments.map((assignment, index) => (
+							<View
+								key={`${assignment.taskTitle}-${index}`}
+								style={styles.assignmentRow}>
 								<View
-									key={`${assignment.taskTitle}-${index}`}
-									style={styles.assignmentRow}>
-									<View
-										style={[
-											styles.avatarDot,
-											{
-												backgroundColor: getToneColor(
-													assignment.childAvatarTone
-												),
-											},
-										]}
-									/>
-									<View style={styles.assignmentInfo}>
-										<Text style={styles.assignmentTask}>
-											{assignment.taskTitle}
-										</Text>
-										<Text
-											style={styles.assignmentChild}
-											numberOfLines={1}>
-											{assignment.childName}
-											{assignment.routineName
-												? ` • ${assignment.routineName}`
-												: ""}
-										</Text>
-									</View>
+									style={[
+										styles.avatarDot,
+										{
+											backgroundColor: getToneColor(
+												assignment.childAvatarTone
+											),
+										},
+									]}
+								/>
+								<View style={styles.assignmentInfo}>
+									<Text style={styles.assignmentTask}>
+										{assignment.taskTitle}
+									</Text>
+									<Text
+										style={styles.assignmentChild}
+										numberOfLines={1}>
+										{assignment.childName}
+										{assignment.routineName
+											? ` • ${assignment.routineName}`
+											: ""}
+									</Text>
 								</View>
-							))
+							</View>
+						))
 					)}
 					<TouchableOpacity
 						style={styles.linkButton}
@@ -292,77 +314,79 @@ const ParentHome = ({
 					</View>
 				)}
 
-				<View style={styles.card}>
-					<View style={styles.cardHeader}>
-						<Text style={styles.sectionTitle}>Privileges</Text>
-						<TouchableOpacity
-							onPress={() => router.push("/family/privileges")}>
-							<Text style={styles.linkText}>Manage</Text>
-						</TouchableOpacity>
+				{hasPrivilegeData ? (
+					<View style={styles.card}>
+						<View style={styles.cardHeader}>
+							<Text style={styles.sectionTitle}>Privileges</Text>
+							<TouchableOpacity
+								onPress={() => router.push("/family/privileges")}>
+								<Text style={styles.linkText}>Manage</Text>
+							</TouchableOpacity>
+						</View>
+						<Text style={styles.cardLabel}>Pending requests</Text>
+						{pendingPrivileges.length === 0 ? (
+							<Text style={styles.lightText}>
+								No pending requests right now.
+							</Text>
+						) : (
+							pendingPrivileges.map(request => (
+								<View
+									key={request.id}
+									style={styles.assignmentRow}>
+									<View
+										style={[
+											styles.avatarDot,
+											{
+												backgroundColor: getToneColor(
+													request.childAvatarTone
+												),
+											},
+										]}
+									/>
+									<View style={styles.assignmentInfo}>
+										<Text style={styles.assignmentTask}>
+											{request.privilege.title}
+										</Text>
+										<Text style={styles.assignmentChild}>
+											{request.childName ?? "Unknown child"} •{" "}
+											{request.cost} seeds
+										</Text>
+									</View>
+								</View>
+							))
+						)}
+						<Text style={styles.cardLabel}>Active tickets</Text>
+						{activePrivilegeTickets.length === 0 ? (
+							<Text style={styles.lightText}>No active tickets.</Text>
+						) : (
+							activePrivilegeTickets.map(ticket => (
+								<View
+									key={ticket.id}
+									style={styles.assignmentRow}>
+									<View
+										style={[
+											styles.avatarDot,
+											{
+												backgroundColor: getToneColor(
+													ticket.childAvatarTone
+												),
+											},
+										]}
+									/>
+									<View style={styles.assignmentInfo}>
+										<Text style={styles.assignmentTask}>
+											{ticket.privilege.title}
+										</Text>
+										<Text style={styles.assignmentChild}>
+											{ticket.childName ?? "Unknown child"} •{" "}
+											{ticket.cost} seeds
+										</Text>
+									</View>
+								</View>
+							))
+						)}
 					</View>
-					<Text style={styles.cardLabel}>Pending requests</Text>
-					{pendingPrivileges.length === 0 ? (
-						<Text style={styles.lightText}>
-							No pending requests right now.
-						</Text>
-					) : (
-						pendingPrivileges.map(request => (
-							<View
-								key={request.id}
-								style={styles.assignmentRow}>
-								<View
-									style={[
-										styles.avatarDot,
-										{
-											backgroundColor: getToneColor(
-												request.childAvatarTone
-											),
-										},
-									]}
-								/>
-								<View style={styles.assignmentInfo}>
-									<Text style={styles.assignmentTask}>
-										{request.privilege.title}
-									</Text>
-									<Text style={styles.assignmentChild}>
-										{request.childName ?? "Unknown child"} •{" "}
-										{request.cost} seeds
-									</Text>
-								</View>
-							</View>
-						))
-					)}
-					<Text style={styles.cardLabel}>Active tickets</Text>
-					{activePrivilegeTickets.length === 0 ? (
-						<Text style={styles.lightText}>No active tickets.</Text>
-					) : (
-						activePrivilegeTickets.map(ticket => (
-							<View
-								key={ticket.id}
-								style={styles.assignmentRow}>
-								<View
-									style={[
-										styles.avatarDot,
-										{
-											backgroundColor: getToneColor(
-												ticket.childAvatarTone
-											),
-										},
-									]}
-								/>
-								<View style={styles.assignmentInfo}>
-									<Text style={styles.assignmentTask}>
-										{ticket.privilege.title}
-									</Text>
-									<Text style={styles.assignmentChild}>
-										{ticket.childName ?? "Unknown child"} •{" "}
-										{ticket.cost} seeds
-									</Text>
-								</View>
-							</View>
-						))
-					)}
-				</View>
+				) : null}
 
 				{todayPointEntries.length > 0 && (
 					<View style={styles.card}>
@@ -437,6 +461,7 @@ const ChildHome = ({
 	const queryClient = useQueryClient();
 	const [expandedTask, setExpandedTask] = useState<string | null>(null);
 	const [confettiTrigger, setConfettiTrigger] = useState(0);
+	const [refreshing, setRefreshing] = useState(false);
 
 	const tasksQuery = useQuery({
 		queryKey: ["home-child-tasks", token],
@@ -542,11 +567,34 @@ const ChildHome = ({
 				: 0
 			: 0;
 
+	const handleRefresh = async () => {
+		setRefreshing(true);
+		try {
+			await Promise.all([
+				tasksQuery.refetch(),
+				streakSettingsQuery.refetch(),
+				childPointEntriesQuery.refetch(),
+				privilegeRequestsQuery.refetch(),
+				queryClient.invalidateQueries({ queryKey: ["profile", token] }),
+			]);
+		} finally {
+			setRefreshing(false);
+		}
+	};
+
 	return (
 		<SafeAreaView style={styles.safe}>
 			<View style={styles.screen}>
 				<ConfettiBurst trigger={confettiTrigger} />
-				<ScrollView contentContainerStyle={styles.container}>
+				<ScrollView
+					contentContainerStyle={styles.container}
+					refreshControl={
+						<RefreshControl
+							refreshing={refreshing}
+							onRefresh={handleRefresh}
+							tintColor="#6c63ff"
+						/>
+					}>
 					<Text style={styles.greeting}>
 						Hi {profile?.name ?? "there"} 👋
 					</Text>
@@ -600,89 +648,54 @@ const ChildHome = ({
 						);
 					})}
 
-					<View style={styles.card}>
-				<View style={[styles.cardHeader, styles.cardHeaderTight]}>
-					<Text style={styles.sectionTitle}>
-						My Privileges
-					</Text>
-					<TouchableOpacity
-						onPress={() => router.push("/privileges")}>
-						<Text style={styles.linkText}>Open</Text>
-					</TouchableOpacity>
-				</View>
-				{childActiveTickets.length > 0 && (
-							<>
-								<Text style={styles.cardLabel}>
-									Active tickets
-								</Text>
-								{childActiveTickets.map(ticket => (
-									<View
-										key={ticket.id}
-										style={styles.privilegeItem}>
-										<View style={styles.privilegeInfoStack}>
-											<Text style={styles.assignmentTask}>
-												{ticket.privilege.title}
-											</Text>
-											<Text style={styles.privilegeMeta}>
-												{ticket.cost} seeds • Approved{" "}
-												{formatTicketDate(
-													ticket.resolvedAt ??
-														ticket.createdAt
-												)}
-											</Text>
-											{ticket.note ? (
-												<Text style={styles.lightText}>
-													Note: {ticket.note}
+					{privilegeRequests.length > 0 ? (
+						<View style={styles.card}>
+							<View style={[styles.cardHeader, styles.cardHeaderTight]}>
+								<Text style={styles.sectionTitle}>My Privileges</Text>
+								<TouchableOpacity onPress={() => router.push("/privileges")}>
+									<Text style={styles.linkText}>Open</Text>
+								</TouchableOpacity>
+							</View>
+							{childActiveTickets.length > 0 && (
+								<>
+									<Text style={styles.cardLabel}>Active tickets</Text>
+									{childActiveTickets.map((ticket) => (
+										<View key={ticket.id} style={styles.privilegeItem}>
+											<View style={styles.privilegeInfoStack}>
+												<Text style={styles.assignmentTask}>{ticket.privilege.title}</Text>
+												<Text style={styles.privilegeMeta}>
+													{ticket.cost} seeds • Approved{" "}
+													{formatTicketDate(ticket.resolvedAt ?? ticket.createdAt)}
 												</Text>
-											) : null}
+												{ticket.note ? <Text style={styles.lightText}>Note: {ticket.note}</Text> : null}
+											</View>
+											<View style={[styles.statusPill, styles.statusPillCompleted]}>
+												<Text style={styles.statusPillText}>Active</Text>
+											</View>
 										</View>
-										<View
-											style={[
-												styles.statusPill,
-												styles.statusPillCompleted,
-											]}>
-											<Text style={styles.statusPillText}>
-												Active
-											</Text>
+									))}
+								</>
+							)}
+							{childPendingRequests.length > 0 && (
+								<>
+									<Text style={styles.cardLabel}>Pending requests</Text>
+									{childPendingRequests.map((request) => (
+										<View key={request.id} style={styles.privilegeItem}>
+											<View style={styles.privilegeInfoStack}>
+												<Text style={styles.assignmentTask}>{request.privilege.title}</Text>
+												<Text style={styles.privilegeMeta}>
+													{request.cost} seeds • Requested {formatTicketDate(request.createdAt)}
+												</Text>
+											</View>
+											<View style={[styles.statusPill, styles.statusPillPending]}>
+												<Text style={styles.statusPillText}>Pending</Text>
+											</View>
 										</View>
-									</View>
-								))}
-							</>
-						)}
-						{childPendingRequests.length > 0 && (
-							<>
-								<Text style={styles.cardLabel}>
-									Pending requests
-								</Text>
-								{childPendingRequests.map(request => (
-									<View
-										key={request.id}
-										style={styles.privilegeItem}>
-										<View style={styles.privilegeInfoStack}>
-											<Text style={styles.assignmentTask}>
-												{request.privilege.title}
-											</Text>
-											<Text style={styles.privilegeMeta}>
-												{request.cost} seeds • Requested{" "}
-												{formatTicketDate(
-													request.createdAt
-												)}
-											</Text>
-										</View>
-										<View
-											style={[
-												styles.statusPill,
-												styles.statusPillPending,
-											]}>
-											<Text style={styles.statusPillText}>
-												Pending
-											</Text>
-										</View>
-									</View>
-								))}
-							</>
-						)}
-					</View>
+									))}
+								</>
+							)}
+						</View>
+					) : null}
 
 					{streakGoals.length > 0 && (
 						<View style={styles.streakCard}>
@@ -976,8 +989,8 @@ const styles = StyleSheet.create({
 	},
 	progressCard: {
 		borderWidth: 1,
-		borderColor: "#e0e7ff",
-		backgroundColor: "#eef2ff",
+		borderColor: "#c7d2fe",
+		backgroundColor: "#dfe3ff",
 		gap: 6,
 	},
 	pointEntryCard: {

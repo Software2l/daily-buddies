@@ -150,6 +150,18 @@ export default function ProfileScreen() {
                 />
                 {showTimezoneSuggestions ? (
                   <View style={styles.suggestionBox}>
+                    <TouchableOpacity
+                      style={styles.suggestionClose}
+                      onPress={() => {
+                        setFamilyTimezone(lastCommittedTimezone);
+                        setTimezoneQuery("");
+                        setShowTimezoneSuggestions(false);
+                        timezoneInputRef.current?.blur();
+                        Keyboard.dismiss();
+                      }}
+                    >
+                      <Text style={styles.suggestionCloseText}>✕</Text>
+                    </TouchableOpacity>
                     {(timezoneQuery
                       ? COMMON_TIMEZONES.filter((tz) => {
                           const q = timezoneQuery.toLowerCase().trim();
@@ -433,6 +445,7 @@ const styles = StyleSheet.create({
     position: "relative",
     zIndex: 3,
     elevation: 3,
+    paddingTop: 4,
   },
   suggestionRow: {
     paddingHorizontal: 12,
@@ -440,5 +453,16 @@ const styles = StyleSheet.create({
   },
   suggestionText: {
     color: "#1f2937",
+  },
+  suggestionClose: {
+    position: "absolute",
+    top: 4,
+    right: 4,
+    zIndex: 4,
+    padding: 6,
+  },
+  suggestionCloseText: {
+    fontWeight: "700",
+    color: "#475569",
   },
 });

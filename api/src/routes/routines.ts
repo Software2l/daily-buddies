@@ -33,7 +33,7 @@ router.get(
           },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: "asc" },
     });
 
     return res.json(

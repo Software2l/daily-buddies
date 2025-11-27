@@ -43,10 +43,14 @@ export default function ParentManageScreen() {
     password: "",
     avatarTone: "sunrise",
   });
+  const [showInviteParent, setShowInviteParent] = useState(false);
 
   const invalidate = () => {
     if (!token) return;
-    return queryClient.invalidateQueries({ queryKey: ["family-members", token] });
+    return Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["family-members", token] }),
+      queryClient.invalidateQueries({ queryKey: ["family-overview", token] }),
+    ]);
   };
 
   const inviteParentMutation = useMutation({
@@ -198,51 +202,73 @@ export default function ParentManageScreen() {
 				))}
 
 				<View style={styles.inviteCard}>
-					<Text style={styles.sectionTitle}>
-						Invite another parent
-					</Text>
-					<Input
-						placeholder="Name"
-						value={parentForm.name}
-						onChangeText={(value: string) =>
-							setParentForm(prev => ({ ...prev, name: value }))
-						}
-					/>
-					<Input
-						placeholder="Username"
-						autoCapitalize="none"
-						value={parentForm.username}
-						onChangeText={(value: string) =>
-							setParentForm(prev => ({
-								...prev,
-								username: value,
-							}))
-						}
-					/>
-					<Input
-						placeholder="Email"
-						autoCapitalize="none"
-						keyboardType="email-address"
-						value={parentForm.email}
-						onChangeText={(value: string) =>
-							setParentForm(prev => ({ ...prev, email: value }))
-						}
-					/>
-					<Input
-						placeholder="Password"
-						secureTextEntry
-						value={parentForm.password}
-						onChangeText={(value: string) =>
-							setParentForm(prev => ({
-								...prev,
-								password: value,
-							}))
-						}
-					/>
-					<PrimaryButton
-						title="Send Invite"
-						onPress={handleInviteParent}
-					/>
+					<View style={styles.inviteHeader}>
+						<Text style={styles.sectionTitle}>
+							Invite another parent
+						</Text>
+						{!showInviteParent && (
+							<TouchableOpacity
+								onPress={() => setShowInviteParent(true)}
+								style={styles.showFormButton}>
+								<Text style={styles.showFormText}>
+									Show form
+								</Text>
+							</TouchableOpacity>
+						)}
+					</View>
+
+					{showInviteParent && (
+						<>
+							<Input
+								placeholder="Name"
+								value={parentForm.name}
+								onChangeText={(value: string) =>
+									setParentForm(prev => ({
+										...prev,
+										name: value,
+									}))
+								}
+							/>
+							<Input
+								placeholder="Username"
+								autoCapitalize="none"
+								value={parentForm.username}
+								onChangeText={(value: string) =>
+									setParentForm(prev => ({
+										...prev,
+										username: value,
+									}))
+								}
+							/>
+							<Input
+								placeholder="Email"
+								autoCapitalize="none"
+								keyboardType="email-address"
+								value={parentForm.email}
+								onChangeText={(value: string) =>
+									setParentForm(prev => ({
+										...prev,
+										email: value,
+									}))
+								}
+							/>
+							<Input
+								placeholder="Password"
+								secureTextEntry
+								value={parentForm.password}
+								onChangeText={(value: string) =>
+									setParentForm(prev => ({
+										...prev,
+										password: value,
+									}))
+								}
+							/>
+							<PrimaryButton
+								title="Send Invite"
+								onPress={handleInviteParent}
+							/>
+						</>
+					)}
 				</View>
 
 				<Text style={styles.sectionTitle}>Children</Text>
@@ -510,6 +536,22 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 12,
+  },
+  inviteHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  showFormButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+  },
+  showFormText: {
+    color: "#4b5563",
+    fontWeight: "600",
   },
   memberRow: {
     backgroundColor: "#fff",

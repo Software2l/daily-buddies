@@ -29,15 +29,6 @@ type StarterTemplate = {
   }>;
 };
 
-type StarterTask = {
-  title: string;
-  description?: string;
-  icon?: string;
-  points?: number;
-  reminderStyle?: ReminderStyle;
-  frequency?: FrequencyType;
-};
-
 const STARTER_TEMPLATES: StarterTemplate[] = [
   {
     name: "Morning Routine",
@@ -72,24 +63,6 @@ const STARTER_TEMPLATES: StarterTemplate[] = [
       { title: "Tidy Room", icon: "🧹", points: 2 },
       { title: "Read a Book", icon: "📖", points: 2 },
     ],
-  },
-];
-
-const STARTER_TASKS: StarterTask[] = [
-  {
-    title: "Feed Sprout the Cat",
-    description: "Fresh water + crunchy bites",
-    points: 3,
-    icon: "🐾",
-    reminderStyle: ReminderStyle.FRIENDLY,
-    frequency: FrequencyType.DAILY,
-  },
-  {
-    title: "15 min Reading",
-    description: "Choose any cozy book",
-    points: 2,
-    icon: "📖",
-    reminderStyle: ReminderStyle.FRIENDLY,
   },
 ];
 
@@ -130,21 +103,6 @@ async function seedStarterContent(
             reminderStyle: item.reminderStyle ?? ReminderStyle.FRIENDLY,
           })),
         },
-      },
-    });
-  }
-
-  for (const task of STARTER_TASKS) {
-    await tx.task.create({
-      data: {
-        title: task.title,
-        description: task.description,
-        icon: task.icon,
-        points: task.points ?? 1,
-        reminderStyle: task.reminderStyle ?? ReminderStyle.FRIENDLY,
-        frequency: task.frequency ?? FrequencyType.DAILY,
-        familyId,
-        createdById: parentId,
       },
     });
   }
@@ -192,7 +150,14 @@ router.post("/register-parent", async (req, res) => {
 
   const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const family = await tx.family.create({
-      data: { name: familyName, timezone: familyTimezone },
+      data: {
+        name: familyName,
+        timezone: familyTimezone,
+        dailyStreakReward: 0,
+        weeklyStreakReward: 0,
+        monthlyStreakReward: 0,
+        yearlyStreakReward: 0,
+      },
     });
 
     const createdParent = await tx.user.create({
@@ -597,6 +562,8 @@ router.get(
     const startOfDay = startOfDayUTC();
     const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
 
+    const starterTaskTitles = STARTER_TASKS.map((task) => task.title);
+
     const [assignmentCounts, completedToday, parentTaskCounts] = await Promise.all([
       childIds.length
         ? prisma.taskAssignment.groupBy({
@@ -623,7 +590,10 @@ router.get(
         ? prisma.task.groupBy({
             by: ["createdById"],
             _count: { createdById: true },
-            where: { createdById: { in: parentIds } },
+            where: {
+              createdById: { in: parentIds },
+              title: { notIn: starterTaskTitles },
+            },
           })
         : [],
     ]);

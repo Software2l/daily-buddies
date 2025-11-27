@@ -154,7 +154,7 @@ router.get("/", authMiddleware, async (req: AuthenticatedRequest, res) => {
           where: { childId: req.user!.id, date: { gte: start, lt: end } },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: "asc" },
     });
 
     const payload = tasks
@@ -191,7 +191,7 @@ router.get("/", authMiddleware, async (req: AuthenticatedRequest, res) => {
         where: { date: { gte: start, lt: end } },
       },
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: "asc" },
   });
 
   const grouped = tasks.map((task) => {

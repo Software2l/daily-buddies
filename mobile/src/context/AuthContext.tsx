@@ -65,6 +65,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     enabled: !!token,
   });
 
+  useEffect(() => {
+    if (profileQuery.error) {
+      void (async () => {
+        await clearToken();
+        queryClient.removeQueries({ queryKey: ["profile"] });
+      })();
+    }
+  }, [profileQuery.error, queryClient]);
+
   const login = async (identifier: string, password: string) => {
     const response = await loginRequest(identifier, password);
     await persistToken(response.token);
