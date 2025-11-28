@@ -12,6 +12,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef, useState, useEffect } from "react";
 import { useAuth } from "../../src/context/AuthContext";
+import { useI18n } from "../../src/context/I18nContext";
 import {
 	fetchTasks,
 	ParentTaskSummary,
@@ -122,6 +123,7 @@ const formatTicketDate = (value?: string | null) => {
 
 export default function HomeScreen() {
 	const { profile, token } = useAuth();
+	const { translations: t } = useI18n();
 
 	if (!token) {
 		return null;
@@ -132,6 +134,7 @@ export default function HomeScreen() {
 			<ParentHome
 				token={token}
 				profile={profile}
+				t={t}
 			/>
 		);
 	}
@@ -140,6 +143,7 @@ export default function HomeScreen() {
 		<ChildHome
 			token={token}
 			profile={profile}
+			t={t}
 		/>
 	);
 }
@@ -147,9 +151,11 @@ export default function HomeScreen() {
 const ParentHome = ({
 	token,
 	profile,
+	t,
 }: {
 	token: string;
 	profile: ProfileShape;
+	t: any;
 }) => {
 	const router = useRouter();
 	const tasksQuery = useQuery({
@@ -227,24 +233,35 @@ const ParentHome = ({
 					/>
 				}>
 				<Text style={styles.greeting}>
-					Hi {profile?.name ?? "there"} 👋
+					{t.home.greeting(profile?.name ?? "there")}
 				</Text>
 				<Text style={styles.subtitle}>
-					You’re guiding today’s rituals.
+					{t.home.subtitleParent}
 				</Text>
 
 				<View style={styles.card}>
-					<Text style={styles.cardLabel}>Family</Text>
+					<Text style={styles.cardLabel}>{t.home.familyLabel}</Text>
 					<Text style={styles.cardValue}>
-						{profile?.family?.name ?? "Not linked yet"}
+						{profile?.family?.name ?? t.home.notLinked}
 					</Text>
 				</View>
 
 				<View style={styles.card}>
-					<Text style={styles.sectionTitle}>Today's Assignments</Text>
+					<View style={styles.cardHeader}>
+						<Text style={styles.sectionTitle}>
+							{t.home.assignmentsTitle}
+						</Text>
+						<View
+							style={[
+								styles.statusPill,
+								styles.statusPillPending,
+							]}>
+							<Text style={styles.statusPillText}>{t.home.pendingLabel}</Text>
+						</View>
+					</View>
 					{pendingAssignments.length === 0 ? (
 						<Text style={styles.lightText}>
-							All set! No tasks pending right now.
+							{t.home.noPending}
 						</Text>
 					) : (
 						pendingAssignments.map((assignment, index) => (
@@ -280,53 +297,64 @@ const ParentHome = ({
 					<TouchableOpacity
 						style={styles.linkButton}
 						onPress={() => router.push("/history")}>
-						<Text style={styles.linkText}>View history</Text>
+						<Text style={styles.linkText}>{t.home.viewHistory}</Text>
 					</TouchableOpacity>
 				</View>
 
 				{completedAssignments.length > 0 && (
 					<View style={styles.card}>
-						<Text style={styles.sectionTitle}>Recent Wins</Text>
-						{completedAssignments
-							.slice(0, 4)
-							.map((entry, index) => (
+						<View style={styles.cardHeader}>
+							<Text style={styles.sectionTitle}>
+								{t.home.recentWins}
+							</Text>
+							<View
+								style={[
+									styles.statusPill,
+									styles.statusPillCompleted,
+								]}>
+								<Text style={styles.statusPillText}>
+									{t.home.completedLabel}
+								</Text>
+							</View>
+						</View>
+						{completedAssignments.map((entry, index) => (
+							<View
+								key={`${entry.taskTitle}-${index}`}
+								style={styles.assignmentRow}>
 								<View
-									key={`${entry.taskTitle}-${index}`}
-									style={styles.assignmentRow}>
-									<View
-										style={[
-											styles.avatarDot,
-											{
-												backgroundColor: getToneColor(
-													entry.childAvatarTone
-												),
-											},
-										]}
-									/>
-									<View style={styles.assignmentInfo}>
-										<Text style={styles.assignmentChild}>
-											{entry.childName} finished{" "}
-											{entry.taskTitle}
-										</Text>
-									</View>
+									style={[
+										styles.avatarDot,
+										{
+											backgroundColor: getToneColor(
+												entry.childAvatarTone
+											),
+										},
+									]}
+								/>
+								<View style={styles.assignmentInfo}>
+									<Text style={styles.assignmentChild}>
+										{entry.childName} finished{" "}
+										{entry.taskTitle}
+									</Text>
 								</View>
-							))}
+							</View>
+						))}
 					</View>
 				)}
 
 				{hasPrivilegeData ? (
 					<View style={styles.card}>
 						<View style={styles.cardHeader}>
-							<Text style={styles.sectionTitle}>Privileges</Text>
+							<Text style={styles.sectionTitle}>{t.home.privilegesTitle}</Text>
 							<TouchableOpacity
 								onPress={() => router.push("/family/privileges")}>
-								<Text style={styles.linkText}>Manage</Text>
+								<Text style={styles.linkText}>{t.home.manage}</Text>
 							</TouchableOpacity>
 						</View>
-						<Text style={styles.cardLabel}>Pending requests</Text>
+						<Text style={styles.cardLabel}>{t.home.pendingRequests}</Text>
 						{pendingPrivileges.length === 0 ? (
 							<Text style={styles.lightText}>
-								No pending requests right now.
+								{t.home.noPendingRequests}
 							</Text>
 						) : (
 							pendingPrivileges.map(request => (
@@ -348,16 +376,16 @@ const ParentHome = ({
 											{request.privilege.title}
 										</Text>
 										<Text style={styles.assignmentChild}>
-											{request.childName ?? "Unknown child"} •{" "}
-											{request.cost} seeds
+											{request.childName ?? t.privileges?.unknownChild ?? t.home.childFallback} •{" "}
+											{request.cost} {t.home.seedsSuffix}
 										</Text>
 									</View>
 								</View>
 							))
 						)}
-						<Text style={styles.cardLabel}>Active tickets</Text>
+						<Text style={styles.cardLabel}>{t.home.activeTickets}</Text>
 						{activePrivilegeTickets.length === 0 ? (
-							<Text style={styles.lightText}>No active tickets.</Text>
+							<Text style={styles.lightText}>{t.home.noActiveTickets}</Text>
 						) : (
 							activePrivilegeTickets.map(ticket => (
 								<View
@@ -378,8 +406,8 @@ const ParentHome = ({
 											{ticket.privilege.title}
 										</Text>
 										<Text style={styles.assignmentChild}>
-											{ticket.childName ?? "Unknown child"} •{" "}
-											{ticket.cost} seeds
+											{ticket.childName ?? t.privileges?.unknownChild ?? t.home.childFallback} •{" "}
+											{ticket.cost} {t.home.seedsSuffix}
 										</Text>
 									</View>
 								</View>
@@ -391,9 +419,9 @@ const ParentHome = ({
 				{todayPointEntries.length > 0 && (
 					<View style={styles.card}>
 						<View style={styles.cardHeader}>
-							<Text style={styles.sectionTitle}>Gifts & Penalties</Text>
+							<Text style={styles.sectionTitle}>{t.home.giftsTitle}</Text>
 							<TouchableOpacity onPress={() => router.push("/points")}>
-								<Text style={styles.linkText}>Manage</Text>
+								<Text style={styles.linkText}>{t.home.managePoints}</Text>
 							</TouchableOpacity>
 						</View>
 						{todayPointEntries.map(entry => (
@@ -406,7 +434,7 @@ const ParentHome = ({
 								/>
 								<View style={styles.adjustmentInfo}>
 									<Text style={styles.assignmentTask}>
-										{entry.child?.name ?? "Child"}
+										{entry.child?.name ?? t.home.childFallback}
 									</Text>
 									<Text
 										style={[
@@ -417,7 +445,7 @@ const ParentHome = ({
 										]}
 									>
 										{entry.points >= 0 ? "+" : ""}
-										{entry.points} seeds
+										{entry.points} {t.home.seedsSuffix}
 									</Text>
 									{entry.note ? (
 										<Text style={styles.lightText}>{entry.note}</Text>
@@ -432,17 +460,17 @@ const ParentHome = ({
 					<TouchableOpacity
 						style={styles.primaryButton}
 						onPress={() => router.push("/tasks")}>
-						<Text style={styles.buttonText}>Tasks & Routines</Text>
+						<Text style={styles.buttonText}>{t.home.actions.tasks}</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
 						style={styles.ghostButton}
 						onPress={() => router.push("/family")}>
-						<Text style={styles.ghostText}>Family Hub</Text>
+						<Text style={styles.ghostText}>{t.home.actions.family}</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
 						style={styles.ghostButton}
 						onPress={() => router.push("/profile")}>
-						<Text style={styles.ghostText}>Profile</Text>
+						<Text style={styles.ghostText}>{t.home.actions.profile}</Text>
 					</TouchableOpacity>
 				</View>
 			</ScrollView>
@@ -453,9 +481,11 @@ const ParentHome = ({
 const ChildHome = ({
 	token,
 	profile,
+	t,
 }: {
 	token: string;
 	profile: ProfileShape;
+	t: any;
 }) => {
 	const router = useRouter();
 	const queryClient = useQueryClient();
@@ -528,7 +558,7 @@ const ChildHome = ({
 				if (!groups[key]) {
 					groups[key] = {
 						id: key,
-						name: task.routineName ?? "Routine",
+						name: task.routineName ?? t.tasks.createRoutine,
 						tasks: [],
 						daysOfWeek: task.daysOfWeek,
 					};
@@ -596,33 +626,33 @@ const ChildHome = ({
 						/>
 					}>
 					<Text style={styles.greeting}>
-						Hi {profile?.name ?? "there"} 👋
+						{t.home.greeting(profile?.name ?? "there")}
 					</Text>
 					<Text style={styles.subtitle}>
-						Ready to turn chores into small adventures?
+						{t.home.subtitleChild}
 					</Text>
 
 					<View style={styles.card}>
-						<Text style={styles.cardLabel}>Family</Text>
+						<Text style={styles.cardLabel}>{t.home.familyLabel}</Text>
 						<Text style={styles.cardValue}>
-							{profile?.family?.name ?? "Not linked yet"}
+							{profile?.family?.name ?? t.home.notLinked}
 						</Text>
 					</View>
 
 					<View style={[styles.card, styles.progressCard]}>
-						<Text style={styles.cardLabel}>Today</Text>
+						<Text style={styles.cardLabel}>{t.home.todayLabel}</Text>
 						<Text style={styles.cardValue}>
 							{completedCount} / {tasks.length} tasks done
 						</Text>
 						<Text style={styles.seedDetail}>
-							Seeds: {profile?.progress?.seedBalance ?? 0}
+							{t.home.seedsLabel}: {profile?.progress?.seedBalance ?? 0}
 						</Text>
 						<Text style={styles.lightText}>
 							{remainingTasks === 0
-								? "You’ve done every step today."
-								: `${remainingTasks} more ${
-										remainingTasks === 1 ? "step" : "steps"
-								  } to finish strong.`}
+								? t.home.allDone
+								: remainingTasks === 1
+								? t.home.remainingSingle
+								: t.home.remainingPlural(remainingTasks)}
 						</Text>
 					</View>
 
@@ -632,13 +662,13 @@ const ChildHome = ({
 							<View key={entry.id} style={styles.pointEntryCard}>
 								<View style={styles.pointEntryIcon}>
 									<Text style={styles.pointEntryIconLabel}>
-										{isGift ? "😊" : "😕"}
+										{isGift ? t.home.pointGiftIcon : t.home.pointPenaltyIcon}
 									</Text>
 								</View>
 								<View style={{ flex: 1 }}>
 									<Text style={styles.pointAlertAmount}>
 										{isGift ? "+" : "-"}
-										{Math.abs(entry.points)} seeds
+										{Math.abs(entry.points)} {t.home.seedsSuffix}
 									</Text>
 									{entry.note ? (
 										<Text style={styles.pointAlertNote}>{entry.note}</Text>
@@ -651,26 +681,26 @@ const ChildHome = ({
 					{privilegeRequests.length > 0 ? (
 						<View style={styles.card}>
 							<View style={[styles.cardHeader, styles.cardHeaderTight]}>
-								<Text style={styles.sectionTitle}>My Privileges</Text>
+								<Text style={styles.sectionTitle}>{t.home.myPrivileges}</Text>
 								<TouchableOpacity onPress={() => router.push("/privileges")}>
-									<Text style={styles.linkText}>Open</Text>
+									<Text style={styles.linkText}>{t.home.manage}</Text>
 								</TouchableOpacity>
 							</View>
 							{childActiveTickets.length > 0 && (
 								<>
-									<Text style={styles.cardLabel}>Active tickets</Text>
+									<Text style={styles.cardLabel}>{t.home.activeTickets}</Text>
 									{childActiveTickets.map((ticket) => (
 										<View key={ticket.id} style={styles.privilegeItem}>
 											<View style={styles.privilegeInfoStack}>
 												<Text style={styles.assignmentTask}>{ticket.privilege.title}</Text>
 												<Text style={styles.privilegeMeta}>
-													{ticket.cost} seeds • Approved{" "}
+													{ticket.cost} {t.home.seedsSuffix} • {t.home.completedLabel}{" "}
 													{formatTicketDate(ticket.resolvedAt ?? ticket.createdAt)}
 												</Text>
 												{ticket.note ? <Text style={styles.lightText}>Note: {ticket.note}</Text> : null}
 											</View>
 											<View style={[styles.statusPill, styles.statusPillCompleted]}>
-												<Text style={styles.statusPillText}>Active</Text>
+												<Text style={styles.statusPillText}>{t.home.active}</Text>
 											</View>
 										</View>
 									))}
@@ -678,17 +708,18 @@ const ChildHome = ({
 							)}
 							{childPendingRequests.length > 0 && (
 								<>
-									<Text style={styles.cardLabel}>Pending requests</Text>
+									<Text style={styles.cardLabel}>{t.home.pendingRequests}</Text>
 									{childPendingRequests.map((request) => (
 										<View key={request.id} style={styles.privilegeItem}>
 											<View style={styles.privilegeInfoStack}>
 												<Text style={styles.assignmentTask}>{request.privilege.title}</Text>
 												<Text style={styles.privilegeMeta}>
-													{request.cost} seeds • Requested {formatTicketDate(request.createdAt)}
+													{request.cost} {t.home.seedsSuffix} • {t.home.pendingLabel}{" "}
+													{formatTicketDate(request.createdAt)}
 												</Text>
 											</View>
 											<View style={[styles.statusPill, styles.statusPillPending]}>
-												<Text style={styles.statusPillText}>Pending</Text>
+												<Text style={styles.statusPillText}>{t.home.pending}</Text>
 											</View>
 										</View>
 									))}
@@ -701,10 +732,10 @@ const ChildHome = ({
 						<View style={styles.streakCard}>
 							<View style={styles.streakHeader}>
 								<Text style={styles.sectionTitle}>
-									Streak Rewards
+									{t.home.streakRewards}
 								</Text>
 								<Text style={styles.streakValue}>
-									{streakCount} days
+									{streakCount} {t.home.streakDays}
 								</Text>
 							</View>
 							<View style={styles.streakBar}>
@@ -745,7 +776,7 @@ const ChildHome = ({
 											{goal.label}
 										</Text>
 										<Text style={styles.streakGoalReward}>
-											+{goal.reward} seeds
+											+{goal.reward} {t.home.seedsSuffix}
 										</Text>
 									</View>
 								))}
@@ -755,7 +786,7 @@ const ChildHome = ({
 
 					{manualTasks.length > 0 && (
 						<View style={styles.card}>
-							<Text style={styles.sectionTitle}>My Tasks</Text>
+							<Text style={styles.sectionTitle}>{t.home.myTasks}</Text>
 							{manualTasks.map(task => {
 								const isExpanded = expandedTask === task.id;
 								const isCompleted = task.status === "COMPLETED";
@@ -769,7 +800,7 @@ const ChildHome = ({
 											{task.title}
 										</Text>
 										<Text style={styles.assignmentChild}>
-											{task.points} seeds
+											{task.points} {t.home.seedsSuffix}
 										</Text>
 										<Text
 											style={[
@@ -778,18 +809,11 @@ const ChildHome = ({
 													styles.pendingStatus,
 											]}>
 											{isCompleted
-												? "Completed"
-												: "Pending"}
+												? t.home.taskStatusCompleted
+												: t.home.taskStatusPending}
 										</Text>
 										{isExpanded && (
 											<View style={styles.expandArea}>
-												<Text style={styles.lightText}>
-													Tap button to{" "}
-													{isCompleted
-														? "undo"
-														: "complete"}{" "}
-													this task.
-												</Text>
 												<TouchableOpacity
 													style={
 														styles.childActionButton
@@ -805,15 +829,15 @@ const ChildHome = ({
 															}
 														);
 													}}>
-													<Text
-														style={
-															styles.childActionText
-														}>
-														{isCompleted
-															? "Undo"
-															: "Mark Complete"}
-													</Text>
-												</TouchableOpacity>
+														<Text
+															style={
+																styles.childActionText
+															}>
+															{isCompleted
+																? t.home.undo
+																: t.home.markComplete}
+														</Text>
+													</TouchableOpacity>
 											</View>
 										)}
 									</TouchableOpacity>
@@ -827,33 +851,33 @@ const ChildHome = ({
 							task => task.status === "COMPLETED"
 						);
 						return (
-							<View
-								key={group.id}
-								style={styles.card}>
-								<View style={styles.cardHeader}>
-									<Text style={styles.sectionTitle}>
-										{group.name}
-									</Text>
 									<View
-										style={[
-											styles.statusPill,
-											routineComplete
-												? styles.statusPillCompleted
-												: styles.statusPillPending,
-										]}>
-										<Text style={styles.statusPillText}>
-											{routineComplete
-												? "Completed"
-												: "In progress"}
-										</Text>
-									</View>
-								</View>
+										key={group.id}
+										style={styles.card}>
+										<View style={styles.cardHeader}>
+											<Text style={styles.sectionTitle}>
+												{group.name}
+											</Text>
+											<View
+												style={[
+													styles.statusPill,
+													routineComplete
+														? styles.statusPillCompleted
+														: styles.statusPillPending,
+												]}>
+												<Text style={styles.statusPillText}>
+													{routineComplete
+														? t.home.taskStatusCompleted
+														: t.home.routineInProgress}
+												</Text>
+											</View>
+										</View>
 								{group.tasks.map(task => {
 									const isExpanded = expandedTask === task.id;
 									const isCompleted =
 										task.status === "COMPLETED";
 									return (
-										<TouchableOpacity
+									<TouchableOpacity
 											key={task.id}
 											style={styles.taskCard}
 											onPress={() => toggleTask(task.id)}
@@ -863,7 +887,7 @@ const ChildHome = ({
 											</Text>
 											<Text
 												style={styles.assignmentChild}>
-												{task.points} seeds
+												{task.points} {t.home.seedsSuffix}
 											</Text>
 											<Text
 												style={[
@@ -872,21 +896,11 @@ const ChildHome = ({
 														styles.pendingStatus,
 												]}>
 												{isCompleted
-													? "Completed"
-													: "Pending"}
+													? t.home.taskStatusCompleted
+													: t.home.taskStatusPending}
 											</Text>
 											{isExpanded && (
 												<View style={styles.expandArea}>
-													<Text
-														style={
-															styles.lightText
-														}>
-														Tap button to{" "}
-														{isCompleted
-															? "undo"
-															: "complete"}{" "}
-														this routine task.
-													</Text>
 													<TouchableOpacity
 														style={
 															styles.childActionButton
@@ -902,15 +916,15 @@ const ChildHome = ({
 																}
 															);
 														}}>
-														<Text
-															style={
-																styles.childActionText
-															}>
-															{isCompleted
-																? "Undo"
-																: "Mark Complete"}
-														</Text>
-													</TouchableOpacity>
+															<Text
+																style={
+																	styles.childActionText
+																}>
+																{isCompleted
+																	? t.home.undo
+																	: t.home.markComplete}
+															</Text>
+														</TouchableOpacity>
 												</View>
 											)}
 										</TouchableOpacity>
@@ -922,12 +936,12 @@ const ChildHome = ({
 					<TouchableOpacity
 						style={styles.ghostButton}
 						onPress={() => router.push("/profile")}>
-						<Text style={styles.ghostText}>Profile</Text>
+						<Text style={styles.ghostText}>{t.home.openProfile}</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
 						style={styles.textButton}
 						onPress={() => router.push("/history")}>
-						<Text style={styles.textButtonLabel}>Task history</Text>
+						<Text style={styles.textButtonLabel}>{t.home.actions.taskHistory}</Text>
 					</TouchableOpacity>
 				</ScrollView>
 			</View>
@@ -954,7 +968,7 @@ const styles = StyleSheet.create({
 	},
 	subtitle: {
 		color: "#6b7280",
-		lineHeight: 20,
+		fontSize: 15,
 	},
 	card: {
 		backgroundColor: "#fff",

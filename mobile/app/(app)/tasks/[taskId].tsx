@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAuth } from "../../../src/context/AuthContext";
+import { useI18n } from "../../../src/context/I18nContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   assignTask,
@@ -34,6 +35,7 @@ export default function TaskDetailScreen() {
   const router = useRouter();
   const { taskId } = useLocalSearchParams<{ taskId?: string }>();
   const { token } = useAuth();
+  const { translations: t } = useI18n();
   const queryClient = useQueryClient();
 
   const detailQuery = useQuery({
@@ -91,9 +93,9 @@ export default function TaskDetailScreen() {
   const assignedIds = useMemo(() => new Set(detail?.assignments.map((assignment) => assignment.childId)), [detail]);
 
   const handleDelete = () => {
-    Alert.alert("Delete task?", "This will remove the task and its history for assigned children.", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Delete", style: "destructive", onPress: () => deleteMutation.mutate() },
+    Alert.alert(t.tasks.deleteTaskConfirmTitle, t.tasks.deleteTaskConfirmMessage, [
+      { text: t.tasks.back, style: "cancel" },
+      { text: t.tasks.deleteTask, style: "destructive", onPress: () => deleteMutation.mutate() },
     ]);
   };
 
@@ -115,7 +117,7 @@ export default function TaskDetailScreen() {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.centered}>
-          <Text style={styles.errorText}>Unable to load task details.</Text>
+          <Text style={styles.errorText}>{t.tasks.loadTaskError}</Text>
         </View>
       </SafeAreaView>
     );
@@ -126,28 +128,35 @@ export default function TaskDetailScreen() {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.headerRow}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backLabel}>← Back</Text>
+            <Text style={styles.backLabel}>← {t.tasks.back}</Text>
           </TouchableOpacity>
           <Text style={styles.header}>{detail.title}</Text>
         </View>
 
         <View style={styles.infoCard}>
-          <Text style={styles.cardLabel}>Reward</Text>
-          <Text style={styles.cardValue}>{detail.points} seeds</Text>
-          <Text style={styles.cardLabel}>Frequency</Text>
-          <Text style={styles.cardValue}>{detail.frequency}</Text>
-          <Text style={styles.cardLabel}>Days</Text>
+          <Text style={styles.cardLabel}>{t.tasks.rewardLabel}</Text>
           <Text style={styles.cardValue}>
-            {detail.daysOfWeek && detail.daysOfWeek.length > 0 ? detail.daysOfWeek.join(", ") : "Any day"}
+            {detail.points} {t.tasks.seedsSuffix}
+          </Text>
+          <Text style={styles.cardLabel}>{t.tasks.daysLabel}</Text>
+          <Text style={styles.cardValue}>
+            {detail.daysOfWeek && detail.daysOfWeek.length > 0
+              ? detail.daysOfWeek.join(", ")
+              : t.tasks.daysAny}
           </Text>
           {detail.description ? <Text style={styles.description}>{detail.description}</Text> : null}
-          {detail.routineName ? <Text style={styles.description}>Part of {detail.routineName}</Text> : null}
+          {detail.routineName ? (
+            <Text style={styles.description}>
+              {t.tasks.partOfRoutine}
+              {detail.routineName}
+            </Text>
+          ) : null}
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Assigned Children</Text>
+          <Text style={styles.sectionTitle}>{t.tasks.assignedChildren}</Text>
           {detail.assignments.length === 0 ? (
-            <Text style={styles.lightText}>No children assigned yet.</Text>
+            <Text style={styles.lightText}>{t.tasks.noChildrenAssigned}</Text>
           ) : (
             detail.assignments.map((assignment) => (
               <View key={assignment.childId} style={styles.assignmentRow}>
@@ -175,7 +184,7 @@ export default function TaskDetailScreen() {
                     disabled={toggleStatusMutation.isPending}
                   >
                     <Text style={styles.smallActionText}>
-                      {assignment.status === "COMPLETED" ? "Undo" : "Complete"}
+                      {assignment.status === "COMPLETED" ? t.tasks.undo : t.tasks.complete}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -183,7 +192,7 @@ export default function TaskDetailScreen() {
                     onPress={() => unassignMutation.mutate(assignment.childId)}
                     disabled={unassignMutation.isPending}
                   >
-                    <Text style={styles.removeButtonText}>Remove</Text>
+                    <Text style={styles.removeButtonText}>{t.tasks.remove}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -192,9 +201,9 @@ export default function TaskDetailScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Assign to child</Text>
+          <Text style={styles.sectionTitle}>{t.tasks.childAssignHeader}</Text>
           {children.length === 0 ? (
-            <Text style={styles.lightText}>Add children from the family screen first.</Text>
+            <Text style={styles.lightText}>{t.tasks.noChildrenAssign}</Text>
           ) : (
             <View style={styles.chipRow}>
               {children.map((child) => {
@@ -220,9 +229,9 @@ export default function TaskDetailScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Activity</Text>
+          <Text style={styles.sectionTitle}>{t.tasks.recentActivity}</Text>
           {detail.completions.length === 0 ? (
-            <Text style={styles.lightText}>No history yet.</Text>
+            <Text style={styles.lightText}>{t.tasks.noHistory}</Text>
           ) : (
             detail.completions.map((completion) => (
               <View key={completion.id} style={styles.historyRow}>
@@ -236,7 +245,11 @@ export default function TaskDetailScreen() {
                     completion.status === "COMPLETED" ? styles.statusPillCompleted : styles.statusPillPending,
                   ]}
                 >
-                  <Text style={styles.statusText}>{completion.status.toLowerCase()}</Text>
+                  <Text style={styles.statusText}>
+                    {completion.status === "COMPLETED"
+                      ? t.tasks.taskStatusCompleted
+                      : t.tasks.taskStatusPending}
+                  </Text>
                 </View>
               </View>
             ))
@@ -247,7 +260,9 @@ export default function TaskDetailScreen() {
           onPress={handleDelete}
           disabled={deleteMutation.isPending}
         >
-          <Text style={styles.deleteButtonText}>{deleteMutation.isPending ? "Deleting…" : "Delete Task"}</Text>
+          <Text style={styles.deleteButtonText}>
+            {deleteMutation.isPending ? t.tasks.deleting : t.tasks.deleteTask}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

@@ -13,10 +13,12 @@ import {
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../../src/context/AuthContext";
+import { useI18n } from "../../src/context/I18nContext";
 
 export default function RegisterScreen() {
   const router = useRouter();
   const { registerParent } = useAuth();
+  const { translations: t, language, setLanguage } = useI18n();
   const insets = useSafeAreaInsets();
   const [familyName, setFamilyName] = useState("");
   const [name, setName] = useState("");
@@ -27,7 +29,7 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     if (!familyName || !name || !email || !username || !password) {
-      Alert.alert("Missing info", "Please fill every field to get started.");
+      Alert.alert(t.auth.register.missingInfoTitle, t.auth.register.missingInfoMessage);
       return;
     }
 
@@ -44,7 +46,7 @@ export default function RegisterScreen() {
       });
       router.replace("/home");
     } catch (error) {
-      Alert.alert("Could not sign up", (error as Error).message);
+      Alert.alert(t.auth.register.signUpErrorTitle, (error as Error).message);
     } finally {
       setSubmitting(false);
     }
@@ -62,59 +64,61 @@ export default function RegisterScreen() {
           keyboardDismissMode="none"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.card}>
-            <Text style={styles.title}>Create Your Daily Buddies Space ✨</Text>
-            <Text style={styles.subtitle}>
-              A calm home base for routines, rewards, and kind notes.
-            </Text>
+          <View style={styles.languageRow}>
+            <LanguageToggle current={language} onSelect={setLanguage} />
+          </View>
 
-            <Field label="Family Name">
+          <View style={styles.card}>
+            <Text style={styles.title}>{t.auth.register.title}</Text>
+            <Text style={styles.subtitle}>{t.auth.register.subtitle}</Text>
+
+            <Field label={t.auth.register.familyNameLabel}>
               <TextInput
                 style={styles.input}
                 value={familyName}
                 onChangeText={setFamilyName}
-                placeholder="Fern Family"
+                placeholder={t.auth.register.familyNamePlaceholder}
               />
             </Field>
 
-            <Field label="Your Name">
+            <Field label={t.auth.register.yourNameLabel}>
               <TextInput
                 style={styles.input}
                 value={name}
                 onChangeText={setName}
-                placeholder="Maya Fern"
+                placeholder={t.auth.register.yourNamePlaceholder}
               />
             </Field>
 
-            <Field label="Email">
+            <Field label={t.auth.register.emailLabel}>
               <TextInput
                 style={styles.input}
                 autoCapitalize="none"
                 keyboardType="email-address"
                 value={email}
                 onChangeText={setEmail}
-                placeholder="maya@example.com"
+                placeholder={t.auth.register.emailPlaceholder}
               />
             </Field>
 
-            <Field label="Username">
+            <Field label={t.auth.register.usernameLabel}>
               <TextInput
                 style={styles.input}
                 autoCapitalize="none"
                 value={username}
                 onChangeText={setUsername}
-                placeholder="maya"
+                placeholder={t.auth.register.usernamePlaceholder}
               />
             </Field>
 
-            <Field label="Password">
+            <Field label={t.auth.register.passwordLabel}>
               <TextInput
                 style={styles.input}
                 autoCapitalize="none"
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}
-                placeholder="••••••••"
+                placeholder={t.auth.register.passwordPlaceholder}
               />
             </Field>
 
@@ -123,13 +127,15 @@ export default function RegisterScreen() {
               disabled={submitting}
               style={[styles.button, submitting && styles.buttonDisabled]}
             >
-              <Text style={styles.buttonText}>{submitting ? "Creating..." : "Create Family"}</Text>
+              <Text style={styles.buttonText}>
+                {submitting ? t.auth.register.creating : t.auth.register.create}
+              </Text>
             </TouchableOpacity>
 
             <View style={styles.linkRow}>
-              <Text style={styles.lightText}>Already part of Daily Buddies?</Text>
+              <Text style={styles.lightText}>{t.auth.register.haveAccount}</Text>
               <Link href="/login" style={styles.link}>
-                Sign in
+                {t.auth.register.signIn}
               </Link>
             </View>
           </View>
@@ -219,4 +225,52 @@ const styles = StyleSheet.create({
     color: "#2ec4b6",
     fontWeight: "600",
   },
+  languageRow: {
+    alignSelf: "flex-end",
+    marginBottom: 8,
+  },
+  languageToggle: {
+    flexDirection: "row",
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  languageOption: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  languageOptionActive: {
+    backgroundColor: "#e0f2f1",
+  },
+  languageOptionText: {
+    color: "#475569",
+    fontWeight: "600",
+  },
+  languageOptionTextActive: {
+    color: "#0f766e",
+    fontWeight: "700",
+  },
 });
+
+const LanguageToggle = ({
+  current,
+  onSelect,
+}: {
+  current: "en" | "mm";
+  onSelect: (language: "en" | "mm") => Promise<void>;
+}) => (
+  <View style={styles.languageToggle}>
+    {(["en", "mm"] as const).map(lang => (
+      <TouchableOpacity
+        key={lang}
+        style={[styles.languageOption, current === lang && styles.languageOptionActive]}
+        onPress={() => onSelect(lang)}
+      >
+        <Text style={current === lang ? styles.languageOptionTextActive : styles.languageOptionText}>
+          {lang.toUpperCase()}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+);

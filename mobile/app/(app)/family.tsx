@@ -13,6 +13,7 @@ import { useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../src/context/AuthContext";
 import { fetchFamilyOverview, FamilyOverviewEntry } from "../../src/services/api";
+import { useI18n } from "../../src/context/I18nContext";
 
 const TONE_COLORS: Record<string, string> = {
   sunrise: "#fb923c",
@@ -28,6 +29,7 @@ const getToneColor = (tone?: string | null) => TONE_COLORS[tone ?? ""] ?? TONE_C
 export default function FamilyScreen() {
   const router = useRouter();
   const { token, logout, profile } = useAuth();
+  const { translations: t } = useI18n();
   
   const overviewQuery = useQuery({
     queryKey: ["family-overview", token],
@@ -41,7 +43,7 @@ export default function FamilyScreen() {
       await logout();
       router.replace("/login");
     } catch (error) {
-      Alert.alert("Unable to log out", (error as Error).message);
+      Alert.alert(t.family.logoutErrorTitle, (error as Error).message);
     }
   };
 
@@ -60,12 +62,12 @@ export default function FamilyScreen() {
         <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.headerRow}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backLabel}>← Back</Text>
+            <Text style={styles.backLabel}>← {t.family.back}</Text>
           </TouchableOpacity>
-          <Text style={styles.header}>Family Hub 🌼</Text>
+          <Text style={styles.header}>{t.family.title}</Text>
         </View>
 
-          <Text style={styles.subtitle}>Accounts and progress at a glance.</Text>
+          <Text style={styles.subtitle}>{t.family.subtitle}</Text>
 
           {members.map((member) => (
             <MemberCard key={member.id} member={member} />
@@ -75,7 +77,7 @@ export default function FamilyScreen() {
             style={styles.primaryButton}
             onPress={() => router.push("/family/manage/parents")}
           >
-            <Text style={styles.primaryButtonText}>Manage Accounts</Text>
+            <Text style={styles.primaryButtonText}>{t.family.manageAccounts}</Text>
           </TouchableOpacity>
 
           {profile?.role === "PARENT" && (
@@ -84,25 +86,25 @@ export default function FamilyScreen() {
                 style={styles.ghostButton}
                 onPress={() => router.push("/family/rewards")}
               >
-                <Text style={styles.ghostText}>Streak Rewards</Text>
+                <Text style={styles.ghostText}>{t.family.streakRewards}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.ghostButton}
                 onPress={() => router.push("/family/privileges")}
               >
-                <Text style={styles.ghostText}>Manage Privileges</Text>
+                <Text style={styles.ghostText}>{t.family.managePrivileges}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.ghostButton}
                 onPress={() => router.push("/family/nudges")}
               >
-                <Text style={styles.ghostText}>Nudges & Reminders</Text>
+                <Text style={styles.ghostText}>{t.family.nudgesReminders}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.ghostButton}
                 onPress={() => router.push("/points")}
               >
-                <Text style={styles.ghostText}>Gifts & Penalties</Text>
+                <Text style={styles.ghostText}>{t.family.giftsPenalties}</Text>
               </TouchableOpacity>
             </>
           )}
@@ -122,7 +124,8 @@ const humanizeStatLabel = (label: string) => {
 
 const MemberCard = ({ member }: { member: FamilyOverviewEntry }) => {
   const statsEntries = Object.entries(member.stats ?? {});
-  const roleLabel = member.role === "CHILD" ? "Child" : "Parent";
+  const { translations: t } = useI18n();
+  const roleLabel = member.role === "CHILD" ? t.family.roleChild : t.family.roleParent;
 
   return (
     <View style={styles.card}>
@@ -156,7 +159,7 @@ const MemberCard = ({ member }: { member: FamilyOverviewEntry }) => {
         </View>
       </View>
       {statsEntries.length === 0 ? (
-        <Text style={styles.lightText}>No stats yet.</Text>
+        <Text style={styles.lightText}>{t.family.noStats}</Text>
       ) : (
         <View style={styles.statsGrid}>
           {statsEntries.map(([label, value]) => (

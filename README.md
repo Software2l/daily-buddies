@@ -52,8 +52,10 @@ npm run dev         # starts the API on http://localhost:4000
 # Mobile App
 cd daily-buddies/mobile
 npm install
-npm start           # run Expo (press i for iOS simulator, a for Android, or scan the QR in Expo Go)
+npm start           # run Expo dev build (press i for iOS simulator, a for Android)
 ```
+
+> Note: The app now requires an Expo Dev Client build (Expo Go is no longer sufficient). If you don't have one installed on your device/simulator, run `expo run:ios --device` or `expo run:android --device` once to install the dev client, then use `npm start` and press `i`/`a` to launch it.
 
 ## API Tests
 

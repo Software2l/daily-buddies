@@ -12,7 +12,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useAuth } from "../../src/context/AuthContext";
 import { fetchTaskHistory, TaskHistoryEntry, fetchFamilyMembers } from "../../src/services/api";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { useI18n } from "../../src/context/I18nContext";
 
 const toneColors: Record<string, string> = {
   sunrise: "#fb923c",
@@ -28,6 +29,7 @@ const getToneColor = (tone?: string | null) => toneColors[tone ?? ""] ?? toneCol
 export default function HistoryScreen() {
   const router = useRouter();
   const { token, profile } = useAuth();
+  const { translations: t } = useI18n();
   const [selectedChild, setSelectedChild] = useState<string | undefined>(undefined);
 
   const historyQuery = useQuery({
@@ -51,15 +53,20 @@ export default function HistoryScreen() {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.headerRow}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backLabel}>← Back</Text>
+            <Text style={styles.backLabel}>← {t.history.back}</Text>
           </TouchableOpacity>
-          <Text style={styles.header}>Task History</Text>
+          <Text style={styles.header}>{t.history.title}</Text>
         </View>
 
         {profile?.role === "PARENT" && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.filterRow}
+            contentContainerStyle={styles.filterRowContent}
+          >
             <FilterChip
-              label="All"
+              label={t.history.filterAll}
               active={!selectedChild}
               onPress={() => setSelectedChild(undefined)}
             />
@@ -83,42 +90,67 @@ export default function HistoryScreen() {
         )}
 
         {historyQuery.data?.map((entry) => (
-          <HistoryCard key={entry.id} entry={entry} isParent={profile?.role === "PARENT"} />
+          <HistoryCard
+            key={entry.id}
+            entry={entry}
+            isParent={profile?.role === "PARENT"}
+            statusLabels={{
+              completed: t.history.statusCompleted,
+              pending: t.history.statusPending,
+            }}
+            seedsEarnedSuffix={t.history.seedsEarnedSuffix}
+          />
         ))}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-const HistoryCard = ({ entry, isParent }: { entry: TaskHistoryEntry; isParent: boolean }) => (
-  <View style={styles.card}>
-    <View style={styles.cardHeader}>
-      <Text style={styles.taskTitle}>{entry.taskTitle}</Text>
-      <View
-        style={[
-          styles.statusPill,
-          entry.status === "COMPLETED" ? styles.statusPillCompleted : styles.statusPillPending,
-        ]}
-      >
-        <Text style={styles.statusPillText}>{entry.status.toLowerCase()}</Text>
-      </View>
-    </View>
-    <Text style={styles.detailText}>{new Date(entry.date).toLocaleString()}</Text>
-    {isParent ? (
-      <View style={styles.childRow}>
+const HistoryCard = ({
+  entry,
+  isParent,
+  statusLabels,
+  seedsEarnedSuffix,
+}: {
+  entry: TaskHistoryEntry;
+  isParent: boolean;
+  statusLabels: { completed: string; pending: string };
+  seedsEarnedSuffix: string;
+}) => {
+  const statusLabel =
+    entry.status === "COMPLETED" ? statusLabels.completed : statusLabels.pending;
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHeader}>
+        <Text style={styles.taskTitle}>{entry.taskTitle}</Text>
         <View
           style={[
-            styles.avatarDot,
-            { backgroundColor: getToneColor(entry.childAvatarTone) },
+            styles.statusPill,
+            entry.status === "COMPLETED" ? styles.statusPillCompleted : styles.statusPillPending,
           ]}
-        />
-        <Text style={styles.detailText}>{entry.childName}</Text>
+        >
+          <Text style={styles.statusPillText}>{statusLabel}</Text>
+        </View>
       </View>
-    ) : (
-      <Text style={styles.detailText}>{entry.points ?? 0} seeds earned</Text>
-    )}
-  </View>
-);
+      <Text style={styles.detailText}>{new Date(entry.date).toLocaleString()}</Text>
+      {isParent ? (
+        <View style={styles.childRow}>
+          <View
+            style={[
+              styles.avatarDot,
+              { backgroundColor: getToneColor(entry.childAvatarTone) },
+            ]}
+          />
+          <Text style={styles.detailText}>{entry.childName}</Text>
+        </View>
+      ) : (
+        <Text style={styles.detailText}>
+          {entry.points ?? 0} {seedsEarnedSuffix}
+        </Text>
+      )}
+    </View>
+  );
+};
 
 const FilterChip = ({
   label,
@@ -210,7 +242,13 @@ const styles = StyleSheet.create({
     flexGrow: 0,
     marginVertical: 8,
   },
+  filterRowContent: {
+    alignItems: "center",
+  },
   chip: {
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
     borderWidth: 1,
     borderColor: "#e4e4e7",
     borderRadius: 16,

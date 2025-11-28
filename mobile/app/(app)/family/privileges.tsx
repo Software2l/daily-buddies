@@ -14,6 +14,7 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useAuth } from "../../../src/context/AuthContext";
+import { useI18n } from "../../../src/context/I18nContext";
 import {
   fetchPrivileges,
   createPrivilege,
@@ -37,6 +38,7 @@ const getToneColor = (tone?: string | null) => TONE_COLORS[tone ?? ""] ?? TONE_C
 export default function FamilyPrivilegesScreen() {
   const router = useRouter();
   const { token, profile } = useAuth();
+  const { translations: t } = useI18n();
   const insets = useSafeAreaInsets();
   const isParent = profile?.role === "PARENT";
   const [form, setForm] = useState({ title: "", cost: "1", description: "" });
@@ -65,7 +67,7 @@ export default function FamilyPrivilegesScreen() {
       setForm({ title: "", cost: "1", description: "" });
       await privilegesQuery.refetch();
     },
-    onError: (error: Error) => Alert.alert("Unable to add privilege", error.message),
+    onError: (error: Error) => Alert.alert(t.privileges.unableAdd, error.message),
   });
 
   const deletePrivilegeMutation = useMutation({
@@ -73,7 +75,7 @@ export default function FamilyPrivilegesScreen() {
     onSuccess: async () => {
       await privilegesQuery.refetch();
     },
-    onError: (error: Error) => Alert.alert("Unable to remove", error.message),
+    onError: (error: Error) => Alert.alert(t.privileges.unableRemove, error.message),
   });
 
   const decideMutation = useMutation({
@@ -82,16 +84,16 @@ export default function FamilyPrivilegesScreen() {
     onSuccess: async () => {
       await requestsQuery.refetch();
     },
-    onError: (error: Error) => Alert.alert("Unable to update request", error.message),
+    onError: (error: Error) => Alert.alert(t.privileges.unableUpdateRequest, error.message),
   });
 
   const terminateMutation = useMutation({
     mutationFn: (requestId: string) => terminatePrivilegeRequest(token!, requestId),
     onSuccess: async () => {
       await requestsQuery.refetch();
-      Alert.alert("Ticket ended", "Privilege ticket has been terminated.");
+      Alert.alert(t.privileges.ticketEndedTitle, t.privileges.ticketEndedMessage);
     },
-    onError: (error: Error) => Alert.alert("Unable to terminate", error.message),
+    onError: (error: Error) => Alert.alert(t.privileges.unableTerminate, error.message),
   });
 
   if (!token) {
@@ -102,9 +104,9 @@ export default function FamilyPrivilegesScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
         <View style={styles.fallback}>
-          <Text style={styles.lightText}>Only parents can edit privileges.</Text>
+          <Text style={styles.lightText}>{t.privileges.onlyParents}</Text>
           <TouchableOpacity style={styles.primaryButton} onPress={() => router.replace("/home")}>
-            <Text style={styles.primaryText}>Return home</Text>
+            <Text style={styles.primaryText}>{t.privileges.returnHome}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -129,20 +131,18 @@ export default function FamilyPrivilegesScreen() {
         >
           <View style={styles.headerRow}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-              <Text style={styles.backLabel}>← Back</Text>
+              <Text style={styles.backLabel}>← {t.privileges.back}</Text>
             </TouchableOpacity>
-            <Text style={styles.header}>Manage Privilege 🌿</Text>
+            <Text style={styles.header}>{t.privileges.title}</Text>
           </View>
-          <Text style={styles.subtitle}>Design experiences, approve requests, and tidy up tickets.</Text>
+          <Text style={styles.subtitle}>{t.privileges.subtitle}</Text>
 
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Privilege ideas</Text>
-            <Text style={styles.lightText}>
-              Keep options playful and growth-focused. Remove anything that no longer fits your family.
-            </Text>
+            <Text style={styles.sectionTitle}>{t.privileges.privilegeIdeas}</Text>
+            <Text style={styles.lightText}>{t.privileges.privilegeIdeasHint}</Text>
             <View style={styles.privilegeList}>
               {(privilegesQuery.data ?? []).length === 0 ? (
-                <Text style={styles.lightText}>No privileges created yet.</Text>
+                <Text style={styles.lightText}>{t.privileges.noPrivileges}</Text>
               ) : (
                 privilegesQuery.data!.map((privilege) => (
                   <View key={privilege.id} style={styles.privilegeRow}>
@@ -151,12 +151,14 @@ export default function FamilyPrivilegesScreen() {
                       {privilege.description ? <Text style={styles.lightText}>{privilege.description}</Text> : null}
                     </View>
                     <View style={styles.privilegeActions}>
-                      <Text style={styles.privilegeCost}>{privilege.cost} seeds</Text>
+                      <Text style={styles.privilegeCost}>
+                        {privilege.cost} {t.privileges.seedsSuffix}
+                      </Text>
                       <TouchableOpacity
                         onPress={() => deletePrivilegeMutation.mutate(privilege.id)}
                         style={styles.smallGhostButton}
                       >
-                        <Text style={styles.smallGhostText}>Remove</Text>
+                        <Text style={styles.smallGhostText}>{t.privileges.remove}</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -165,9 +167,9 @@ export default function FamilyPrivilegesScreen() {
             </View>
           </View>
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Pending requests</Text>
+            <Text style={styles.sectionTitle}>{t.privileges.pendingRequests}</Text>
             {pendingRequests.length === 0 ? (
-              <Text style={styles.lightText}>No requests yet.</Text>
+              <Text style={styles.lightText}>{t.privileges.noRequests}</Text>
             ) : (
               pendingRequests.map((request) => (
                 <View key={request.id} style={styles.requestRow}>
@@ -175,11 +177,11 @@ export default function FamilyPrivilegesScreen() {
                     <View style={styles.requestInfo}>
                       <Text style={styles.privilegeTitle}>{request.privilege.title}</Text>
                       <Text style={styles.lightText}>
-                        {request.childName ?? "Unknown child"} • {request.cost} seeds
+                        {request.childName ?? t.privileges.unknownChild} • {request.cost} {t.privileges.seedsSuffix}
                       </Text>
                     </View>
                     <View style={[styles.requestStatusPill, styles.requestStatusPending]}>
-                      <Text style={styles.requestStatusText}>pending</Text>
+                      <Text style={styles.requestStatusText}>{t.privileges.pendingLabel}</Text>
                     </View>
                   </View>
                   {request.note ? <Text style={styles.lightText}>Note: {request.note}</Text> : null}
@@ -189,14 +191,16 @@ export default function FamilyPrivilegesScreen() {
                       onPress={() => decideMutation.mutate({ requestId: request.id, status: "APPROVED" })}
                       disabled={decideMutation.isPending}
                     >
-                      <Text style={styles.approveText}>{decideMutation.isPending ? "..." : "Approve"}</Text>
+                      <Text style={styles.approveText}>
+                        {decideMutation.isPending ? "..." : t.privileges.approve}
+                      </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.smallGhostButton}
                       onPress={() => decideMutation.mutate({ requestId: request.id, status: "REJECTED" })}
                       disabled={decideMutation.isPending}
                     >
-                      <Text style={styles.smallGhostText}>Reject</Text>
+                      <Text style={styles.smallGhostText}>{t.privileges.reject}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -206,13 +210,13 @@ export default function FamilyPrivilegesScreen() {
 
           <View style={styles.card}>
             <View style={styles.cardHeaderRow}>
-              <Text style={styles.sectionTitle}>Active tickets</Text>
+              <Text style={styles.sectionTitle}>{t.privileges.activeTickets}</Text>
               <TouchableOpacity style={styles.linkButton} onPress={() => router.push("/privileges/history")}>
-                <Text style={styles.linkText}>Ticket history</Text>
+                <Text style={styles.linkText}>{t.privileges.ticketHistory}</Text>
               </TouchableOpacity>
             </View>
             {activeTickets.length === 0 ? (
-              <Text style={styles.lightText}>No active tickets.</Text>
+              <Text style={styles.lightText}>{t.privileges.noActiveTickets}</Text>
             ) : (
               activeTickets.map((ticket) => (
                 <View key={ticket.id} style={styles.requestRow}>
@@ -228,11 +232,11 @@ export default function FamilyPrivilegesScreen() {
                         <Text style={styles.privilegeTitle}>{ticket.privilege.title}</Text>
                       </View>
                       <Text style={styles.lightText}>
-                        {ticket.childName ?? "Unknown child"} • {ticket.cost} seeds
+                        {ticket.childName ?? t.privileges.unknownChild} • {ticket.cost} {t.privileges.seedsSuffix}
                       </Text>
                     </View>
                     <View style={[styles.requestStatusPill, styles.requestStatusApproved]}>
-                      <Text style={styles.requestStatusText}>approved</Text>
+                      <Text style={styles.requestStatusText}>{t.privileges.approvedLabel}</Text>
                     </View>
                   </View>
                   {ticket.note ? <Text style={styles.lightText}>Note: {ticket.note}</Text> : null}
@@ -242,7 +246,7 @@ export default function FamilyPrivilegesScreen() {
                     disabled={terminateMutation.isPending}
                   >
                     <Text style={styles.terminateText}>
-                      {terminateMutation.isPending ? "Terminating..." : "Terminate"}
+                      {terminateMutation.isPending ? t.privileges.terminating : t.privileges.terminate}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -251,21 +255,21 @@ export default function FamilyPrivilegesScreen() {
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Add privilege</Text>
-            <Text style={styles.lightText}>Add new ideas at the end of the day so kids have something to look forward to.</Text>
+            <Text style={styles.sectionTitle}>{t.privileges.addPrivilege}</Text>
+            <Text style={styles.lightText}>{t.privileges.addPrivilegeHint}</Text>
             <PrivilegeInput
-              label="Title"
+              label={t.privileges.titleLabel}
               value={form.title}
               onChangeText={(value) => setForm((prev) => ({ ...prev, title: value }))}
             />
             <PrivilegeInput
-              label="Cost"
+              label={t.privileges.costLabel}
               value={form.cost}
               keyboardType="numeric"
               onChangeText={(value) => setForm((prev) => ({ ...prev, cost: value }))}
             />
             <PrivilegeInput
-              label="Description"
+              label={t.privileges.descriptionLabel}
               value={form.description}
               onChangeText={(value) => setForm((prev) => ({ ...prev, description: value }))}
             />
@@ -273,7 +277,7 @@ export default function FamilyPrivilegesScreen() {
               style={[styles.primaryButton, createPrivilegeMutation.isPending && styles.disabled]}
               onPress={() => {
                 if (!form.title.trim()) {
-                  Alert.alert("Title required", "Give the privilege a short title.");
+                  Alert.alert(t.privileges.titleRequiredTitle, t.privileges.titleRequiredMessage);
                   return;
                 }
                 createPrivilegeMutation.mutate({
@@ -285,7 +289,7 @@ export default function FamilyPrivilegesScreen() {
               disabled={createPrivilegeMutation.isPending}
             >
               <Text style={styles.primaryText}>
-                {createPrivilegeMutation.isPending ? "Adding..." : "Add privilege"}
+                {createPrivilegeMutation.isPending ? t.privileges.addingPrivilege : t.privileges.addPrivilegeButton}
               </Text>
             </TouchableOpacity>
           </View>

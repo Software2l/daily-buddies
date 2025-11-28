@@ -14,6 +14,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { useRouter } from "expo-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../../src/context/AuthContext";
+import { useI18n } from "../../../src/context/I18nContext";
 import {
   createPointEntry,
   fetchFamilyMembers,
@@ -43,6 +44,7 @@ export default function PointsScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { token, profile } = useAuth();
+  const { translations: t } = useI18n();
   const insets = useSafeAreaInsets();
   const isParent = profile?.role === "PARENT";
 
@@ -70,9 +72,12 @@ export default function PointsScreen() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["points", token] });
       setForm((prev) => ({ ...prev, amount: "", note: "" }));
-      Alert.alert("Saved", form.type === "GIFT" ? "Gift shared." : "Penalty noted.");
+      Alert.alert(
+        t.points.alertSavedTitle,
+        form.type === "GIFT" ? t.points.alertGiftMessage : t.points.alertPenaltyMessage,
+      );
     },
-    onError: (error: Error) => Alert.alert("Unable to save", error.message),
+    onError: (error: Error) => Alert.alert(t.points.alertUnableSaveTitle, error.message),
   });
 
   if (!token) {
@@ -87,12 +92,12 @@ export default function PointsScreen() {
       return;
     }
     if (!form.childId) {
-      Alert.alert("Select child", "Pick who should receive the update.");
+      Alert.alert(t.points.alertSelectChildTitle, t.points.alertSelectChildMessage);
       return;
     }
     const amount = Math.abs(Math.trunc(Number(form.amount)));
     if (!amount) {
-      Alert.alert("Amount needed", "Add the number of seeds to give or deduct.");
+      Alert.alert(t.points.alertAmountTitle, t.points.alertAmountMessage);
       return;
     }
 
@@ -106,10 +111,10 @@ export default function PointsScreen() {
 
   const renderEntriesHeader = () => (
     <View style={styles.cardHeaderRow}>
-      <Text style={styles.sectionTitle}>Today</Text>
+      <Text style={styles.sectionTitle}>{t.points.today}</Text>
       {isParent ? (
         <TouchableOpacity style={styles.linkButton} onPress={() => router.push("/points/history")}>
-          <Text style={styles.linkText}>View history</Text>
+          <Text style={styles.linkText}>{t.points.viewHistory}</Text>
         </TouchableOpacity>
       ) : null}
     </View>
@@ -129,33 +134,42 @@ export default function PointsScreen() {
         >
           <View style={styles.headerRow}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-              <Text style={styles.backLabel}>← Back</Text>
+              <Text style={styles.backLabel}>← {t.family?.back ?? "Back"}</Text>
             </TouchableOpacity>
             <Text style={styles.header}>
-              {isParent ? "Gifts & Penalties" : "Seed Notes"}
+              {isParent ? t.points.titleParent : t.points.titleChild}
             </Text>
           </View>
           <Text style={styles.subtitle}>
-            Celebrate wins or gently correct moments. Everything stays visible for the family.
+            {t.points.subtitle}
           </Text>
 
           <View style={styles.card}>
             {renderEntriesHeader()}
             {entries.length === 0 ? (
-              <Text style={styles.lightText}>Nothing logged today yet.</Text>
+              <Text style={styles.lightText}>{t.points.emptyToday}</Text>
             ) : (
               entries.map((entry) => (
-                <PointEntryRow key={entry.id} entry={entry} isParent={isParent} />
+                <PointEntryRow
+                  key={entry.id}
+                  entry={entry}
+                  isParent={isParent}
+                  labels={{
+                    gift: t.points.entryGiftLabel,
+                    penalty: t.points.entryPenaltyLabel,
+                  }}
+                  seedsSuffix={t.points.seedsSuffix}
+                />
               ))
             )}
           </View>
 
           {isParent ? (
             <View style={styles.card}>
-              <Text style={styles.sectionTitle}>New entry</Text>
-              <Text style={styles.lightText}>Choose a child, type, and amount.</Text>
+              <Text style={styles.sectionTitle}>{t.points.newEntry}</Text>
+              <Text style={styles.lightText}>{t.points.newEntryHint}</Text>
 
-              <Text style={styles.fieldLabel}>Child</Text>
+              <Text style={styles.fieldLabel}>{t.points.fieldChild}</Text>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -193,30 +207,30 @@ export default function PointsScreen() {
                       onPress={() => setForm((prev) => ({ ...prev, type }))}
                     >
                       <Text style={[styles.toggleLabel, active && styles.toggleLabelActive]}>
-                        {type === "GIFT" ? "Gift" : "Penalty"}
+                        {type === "GIFT" ? t.points.typeGift : t.points.typePenalty}
                       </Text>
                     </TouchableOpacity>
                   );
                 })}
               </View>
 
-              <Text style={styles.fieldLabel}>Seeds</Text>
+              <Text style={styles.fieldLabel}>{t.points.fieldSeeds}</Text>
               <TextInput
                 style={styles.input}
                 value={form.amount}
                 onChangeText={(value) => setForm((prev) => ({ ...prev, amount: value }))}
                 keyboardType="number-pad"
-                placeholder="0"
+                placeholder={t.points.amountPlaceholder}
                 placeholderTextColor="#94a3b8"
               />
 
-              <Text style={styles.fieldLabel}>Note</Text>
+              <Text style={styles.fieldLabel}>{t.points.fieldNote}</Text>
               <TextInput
                 style={[styles.input, styles.noteInput]}
                 multiline
                 value={form.note}
                 onChangeText={(value) => setForm((prev) => ({ ...prev, note: value }))}
-                placeholder="Share why you’re adjusting seeds…"
+                placeholder={t.points.notePlaceholder}
                 placeholderTextColor="#94a3b8"
               />
 
@@ -226,7 +240,7 @@ export default function PointsScreen() {
                 onPress={handleSubmit}
               >
                 <Text style={styles.primaryButtonLabel}>
-                  {form.type === "GIFT" ? "Give seeds" : "Deduct seeds"}
+                  {form.type === "GIFT" ? t.points.buttonGift : t.points.buttonPenalty}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -237,7 +251,17 @@ export default function PointsScreen() {
   );
 }
 
-const PointEntryRow = ({ entry, isParent }: { entry: PointEntry; isParent: boolean }) => {
+const PointEntryRow = ({
+  entry,
+  isParent,
+  labels,
+  seedsSuffix,
+}: {
+  entry: PointEntry;
+  isParent: boolean;
+  labels: { gift: string; penalty: string };
+  seedsSuffix: string;
+}) => {
   const isGift = entry.points >= 0;
   const tone = entry.child?.avatarTone;
   return (
@@ -254,10 +278,10 @@ const PointEntryRow = ({ entry, isParent }: { entry: PointEntry; isParent: boole
       </View>
       <View style={{ flex: 1 }}>
         <View style={styles.entryHeader}>
-          <Text style={styles.entryTitle}>{isGift ? "Gift" : "Penalty"}</Text>
+          <Text style={styles.entryTitle}>{isGift ? labels.gift : labels.penalty}</Text>
           <Text style={[styles.entryAmount, { color: isGift ? "#16a34a" : "#6366f1" }]}>
             {isGift ? "+" : "-"}
-            {Math.abs(entry.points)} seeds
+            {Math.abs(entry.points)} {seedsSuffix}
           </Text>
         </View>
         {entry.note ? <Text style={styles.entryNote}>{entry.note}</Text> : null}

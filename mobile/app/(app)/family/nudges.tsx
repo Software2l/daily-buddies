@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DEFAULT_NUDGES } from "../../../src/constants/nudges";
 import { useAuth } from "../../../src/context/AuthContext";
 import { fetchNudges, NudgeSetting, updateNudges } from "../../../src/services/api";
+import { useI18n } from "../../../src/context/I18nContext";
 
 const TONE_COLORS: Record<string, string> = {
   sunrise: "#fb923c",
@@ -18,8 +19,8 @@ const TONE_COLORS: Record<string, string> = {
 
 const getToneColor = (tone?: string | null) => TONE_COLORS[tone ?? ""] ?? TONE_COLORS.default;
 
-const formatDisplayTime = (value?: string | null) => {
-  if (!value) return "--:--";
+const formatDisplayTime = (value?: string | null, fallback = "Set time") => {
+  if (!value) return fallback;
   const match = value.match(/^(\d{1,2}):([0-5]\d)$/);
   if (!match) return value;
   const [hour, minute] = match.slice(1).map((entry) => Number(entry));
@@ -32,6 +33,7 @@ export default function NudgeSettingsScreen() {
   const router = useRouter();
   const { token, profile } = useAuth();
   const queryClient = useQueryClient();
+  const { translations: t } = useI18n();
   const [drafts, setDrafts] = useState<Record<string, NudgeSetting[]>>({});
   const [savingChildId, setSavingChildId] = useState<string | null>(null);
 
@@ -71,7 +73,7 @@ export default function NudgeSettingsScreen() {
     },
     onError: (error: Error) => {
       setSavingChildId(null);
-      Alert.alert("Could not save nudges", error.message);
+      Alert.alert(t.nudges.saveErrorTitle, error.message);
     },
   });
 
@@ -110,7 +112,7 @@ export default function NudgeSettingsScreen() {
           );
           return { ...current, [childId]: next };
         });
-        Alert.alert("Could not save", error.message);
+        Alert.alert(t.nudges.toggleErrorTitle, error.message);
       })
       .finally(() => setSavingChildId(null));
   };
@@ -119,7 +121,7 @@ export default function NudgeSettingsScreen() {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.centered}>
-          <Text style={styles.lightText}>Only parents can manage nudges.</Text>
+          <Text style={styles.lightText}>{t.nudges.onlyParents}</Text>
         </View>
       </SafeAreaView>
     );
@@ -130,7 +132,7 @@ export default function NudgeSettingsScreen() {
       <SafeAreaView style={styles.safe}>
         <View style={styles.centered}>
           <ActivityIndicator color="#6c63ff" />
-          <Text style={styles.lightText}>Loading reminders...</Text>
+          <Text style={styles.lightText}>{t.nudges.loading}</Text>
         </View>
       </SafeAreaView>
     );
@@ -143,23 +145,21 @@ export default function NudgeSettingsScreen() {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.headerRow}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backLabel}>← Back</Text>
+            <Text style={styles.backLabel}>← {t.nudges.back}</Text>
           </TouchableOpacity>
-          <Text style={styles.header}>Nudges & Reminders</Text>
+          <Text style={styles.header}>{t.nudges.title}</Text>
         </View>
-        <Text style={styles.subtitle}>
-          Quick on/off here. Changes save instantly. Tap edit to change times or messages.
-        </Text>
+        <Text style={styles.subtitle}>{t.nudges.subtitle}</Text>
 
         {entries.length === 0 ? (
           <View style={styles.card}>
-            <Text style={styles.lightText}>No children found yet.</Text>
+            <Text style={styles.lightText}>{t.nudges.noChildren}</Text>
           </View>
         ) : null}
 
         {entries.map(([childId, nudges]) => {
           const childMeta = nudges[0];
-          const childName = childMeta?.childName ?? "Child";
+          const childName = childMeta?.childName ?? t.nudges.childFallback;
           const avatarTone = childMeta?.childAvatarTone;
           const pending = savingChildId === childId && mutation.isPending;
 
@@ -169,7 +169,7 @@ export default function NudgeSettingsScreen() {
                 <View style={[styles.avatarDot, { backgroundColor: getToneColor(avatarTone) }]} />
                 <View>
                   <Text style={styles.childName}>{childName}</Text>
-                  <Text style={styles.lightText}>Daily nudges</Text>
+                  <Text style={styles.lightText}>{t.nudges.dailyNudges}</Text>
                 </View>
               </View>
 
@@ -179,13 +179,17 @@ export default function NudgeSettingsScreen() {
                   <View key={`${childId}-${entry.type}`} style={styles.nudgeRow}>
                     <View style={styles.nudgeInfo}>
                       <Text style={styles.nudgeLabel}>{entry.label || template?.label || entry.type}</Text>
-                      <Text style={styles.nudgeHint}>Time: {formatDisplayTime(entry.time)}</Text>
+                      <Text style={styles.nudgeHint}>
+                        {t.nudges.timeLabel}: {formatDisplayTime(entry.time, t.nudges.setTime)}
+                      </Text>
                       <Text style={styles.nudgeMessage} numberOfLines={2}>
-                        {entry.message || template?.message || "Local reminder"}
+                        {entry.message || template?.message || t.nudges.localReminder}
                       </Text>
                     </View>
                     <View style={styles.switchRow}>
-                      <Text style={styles.switchLabel}>{entry.enabled ? "On" : "Off"}</Text>
+                      <Text style={styles.switchLabel}>
+                        {entry.enabled ? t.nudges.onLabel : t.nudges.offLabel}
+                      </Text>
                       <Switch
                         value={entry.enabled}
                         onValueChange={(value) => handleToggle(childId, entry.type, value)}
@@ -202,7 +206,7 @@ export default function NudgeSettingsScreen() {
                 style={styles.editButton}
                 onPress={() => router.push(`/family/nudges/${childId}`)}
               >
-                <Text style={styles.editText}>Edit times & messages</Text>
+                <Text style={styles.editText}>{t.nudges.editTimes}</Text>
               </TouchableOpacity>
             </View>
           );

@@ -14,11 +14,13 @@ import {
 } from "react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../../src/context/AuthContext";
+import { useI18n } from "../../../src/context/I18nContext";
 import { fetchFamilyStreakSettings, updateFamilyStreakSettings } from "../../../src/services/api";
 
 export default function RewardsScreen() {
   const router = useRouter();
   const { token, profile } = useAuth();
+  const { translations: t } = useI18n();
   const insets = useSafeAreaInsets();
   const [form, setForm] = useState({ daily: "0", weekly: "0", monthly: "0", yearly: "0" });
 
@@ -48,9 +50,9 @@ export default function RewardsScreen() {
     mutationFn: (payload: Parameters<typeof updateFamilyStreakSettings>[1]) => updateFamilyStreakSettings(token!, payload),
     onSuccess: async () => {
       await streakQuery.refetch();
-      Alert.alert("Saved", "Rewards updated.");
+      Alert.alert(t.rewards.alertSavedTitle, t.rewards.alertSavedMessage);
     },
-    onError: (error: Error) => Alert.alert("Unable to save", error.message),
+    onError: (error: Error) => Alert.alert(t.rewards.alertSaveErrorTitle, error.message),
   });
 
   if (!token) {
@@ -73,47 +75,41 @@ export default function RewardsScreen() {
         >
           <View style={styles.headerRow}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-              <Text style={styles.backLabel}>← Back</Text>
+              <Text style={styles.backLabel}>← {t.rewards.back}</Text>
             </TouchableOpacity>
-            <Text style={styles.header}>Streak Rewards ✨</Text>
+            <Text style={styles.header}>{t.rewards.title}</Text>
           </View>
 
           {!isParent ? (
             <View style={styles.card}>
-              <Text style={styles.sectionTitle}>Rewards overview</Text>
-              <Text style={styles.lightText}>
-                Only parents can configure streak rewards. Ask your parent if you’d like to see new privilege ideas in your
-                Privilege Center screen.
-              </Text>
+              <Text style={styles.sectionTitle}>{t.rewards.parentOnlyTitle}</Text>
+              <Text style={styles.lightText}>{t.rewards.parentOnlyDescription}</Text>
             </View>
           ) : (
             <>
               <View style={styles.card}>
-                <Text style={styles.sectionTitle}>Streak rewards</Text>
-                <Text style={styles.lightText}>
-                  Daily rewards trigger when all assigned tasks finish. Weekly (day 7), monthly (day 31), and yearly (day 365)
-                  bonuses land when the streak stays intact.
-                </Text>
+                <Text style={styles.sectionTitle}>{t.rewards.sectionTitle}</Text>
+                <Text style={styles.lightText}>{t.rewards.sectionDescription}</Text>
               <RewardInput
-                label="Daily reward"
+                label={t.rewards.dailyLabel}
                 value={form.daily}
                 keyboardType="numeric"
                 onChangeText={(value) => setForm((prev) => ({ ...prev, daily: value }))}
               />
               <RewardInput
-                label="Weekly reward"
+                label={t.rewards.weeklyLabel}
                 value={form.weekly}
                 keyboardType="numeric"
                 onChangeText={(value) => setForm((prev) => ({ ...prev, weekly: value }))}
               />
               <RewardInput
-                label="Monthly reward"
+                label={t.rewards.monthlyLabel}
                 value={form.monthly}
                 keyboardType="numeric"
                 onChangeText={(value) => setForm((prev) => ({ ...prev, monthly: value }))}
               />
               <RewardInput
-                label="Yearly reward"
+                label={t.rewards.yearlyLabel}
                 value={form.yearly}
                 keyboardType="numeric"
                 onChangeText={(value) => setForm((prev) => ({ ...prev, yearly: value }))}
@@ -130,7 +126,7 @@ export default function RewardsScreen() {
                   }
                   disabled={mutation.isPending}
                 >
-                  <Text style={styles.primaryText}>{mutation.isPending ? "Saving..." : "Save"}</Text>
+                  <Text style={styles.primaryText}>{mutation.isPending ? t.rewards.saving : t.rewards.save}</Text>
                 </TouchableOpacity>
               </View>
 

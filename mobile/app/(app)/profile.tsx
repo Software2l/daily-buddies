@@ -17,7 +17,7 @@ import { useRouter } from "expo-router";
 import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../../src/context/AuthContext";
 import { updateProfile } from "../../src/services/api";
-import * as Notifications from "expo-notifications";
+import { useI18n } from "../../src/context/I18nContext";
 import { COMMON_TIMEZONES } from "../../src/constants/timezones";
 
 const TONE_COLORS: Record<string, string> = {
@@ -31,6 +31,7 @@ const TONE_COLORS: Record<string, string> = {
 export default function ProfileScreen() {
   const router = useRouter();
   const { profile, token, refreshProfile, logout } = useAuth();
+  const { translations: t, language, setLanguage } = useI18n();
   const insets = useSafeAreaInsets();
   const resolvedTimezone =
     typeof Intl !== "undefined" && Intl.DateTimeFormat().resolvedOptions
@@ -62,16 +63,16 @@ export default function ProfileScreen() {
       updateProfile(token!, payload),
     onSuccess: async () => {
       await refreshProfile();
-      Alert.alert("Updated", "Profile saved.");
+      Alert.alert(t.profile.alertUpdatedTitle, t.profile.alertUpdatedMessage);
     },
     onError: (error: Error) => {
-      Alert.alert("Could not save profile", error.message);
+      Alert.alert(t.profile.alertSaveErrorTitle, error.message);
     },
   });
 
   const handleSave = () => {
     if (!name.trim()) {
-      Alert.alert("Name required", "Please add a display name.");
+      Alert.alert(t.profile.alertNameRequiredTitle, t.profile.alertNameRequiredMessage);
       return;
     }
 
@@ -111,138 +112,118 @@ export default function ProfileScreen() {
             keyboardDismissMode="none"
             showsVerticalScrollIndicator={false}
           >
-          <View style={styles.headerRow}>
-            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-              <Text style={styles.backLabel}>← Back</Text>
-            </TouchableOpacity>
-            <Text style={styles.header}>Profile</Text>
-          </View>
+            <View style={styles.headerRow}>
+              <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                <Text style={styles.backLabel}>← {t.profile.back}</Text>
+              </TouchableOpacity>
+              <Text style={styles.header}>{t.profile.title}</Text>
+              <LanguageToggle current={language} onSelect={setLanguage} />
+            </View>
 
-          <Text style={styles.subtitle}>Update your display name and password.</Text>
+            <Text style={styles.subtitle}>{t.profile.subtitle}</Text>
 
-          <View style={styles.card}>
-            {profile?.username ? (
-              <View style={styles.infoRow}>
-                <Text style={styles.label}>Username</Text>
-                <Text style={styles.infoValue}>@{profile.username}</Text>
-              </View>
-            ) : null}
-            <Input label="Display Name" value={name} onChangeText={setName} />
-            <TonePicker value={avatarTone} onChange={setAvatarTone} />
-            {profile?.role === "PARENT" ? (
-              <View style={styles.field}>
-                <Text style={styles.label}>Family Timezone</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder={resolvedTimezone}
-                  value={timezoneQuery || familyTimezone}
-                  ref={timezoneInputRef}
-                  onFocus={() => setShowTimezoneSuggestions(true)}
-                  onChangeText={(value) => {
-                    setTimezoneQuery(value);
-                    setFamilyTimezone(value);
-                    setShowTimezoneSuggestions(true);
-                  }}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  returnKeyType="done"
-                  onBlur={() => setShowTimezoneSuggestions(false)}
-                />
-                {showTimezoneSuggestions ? (
-                  <View style={styles.suggestionBox}>
-                    <TouchableOpacity
-                      style={styles.suggestionClose}
-                      onPress={() => {
-                        setFamilyTimezone(lastCommittedTimezone);
-                        setTimezoneQuery("");
-                        setShowTimezoneSuggestions(false);
-                        timezoneInputRef.current?.blur();
-                        Keyboard.dismiss();
-                      }}
-                    >
-                      <Text style={styles.suggestionCloseText}>✕</Text>
-                    </TouchableOpacity>
-                    {(timezoneQuery
-                      ? COMMON_TIMEZONES.filter((tz) => {
-                          const q = timezoneQuery.toLowerCase().trim();
-                          return (
-                            tz.name.toLowerCase().includes(q) || tz.offset.toLowerCase().includes(q)
-                          );
-                        })
-                      : COMMON_TIMEZONES)
-                      .slice(0, 8)
-                      .map((tz) => (
-                        <TouchableOpacity
-                          key={tz.name}
-                          style={styles.suggestionRow}
-                          onPress={() => {
-                            setFamilyTimezone(tz.name);
-                            setTimezoneQuery(tz.name);
-                            setLastCommittedTimezone(tz.name);
-                            setShowTimezoneSuggestions(false);
-                          }}
-                        >
-                          <Text style={styles.suggestionText}>
-                            {tz.name} ({tz.offset})
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                  </View>
-                ) : null}
-              </View>
-            ) : null}
-            <Input
-              label="Current Password"
-              value={currentPassword}
-              onChangeText={setCurrentPassword}
-              secureTextEntry
-              placeholder="Required to change password"
-            />
-            <Input
-              label="New Password"
-              value={newPassword}
-              onChangeText={setNewPassword}
-              secureTextEntry
-            />
-            <TouchableOpacity
-              style={[styles.primaryButton, mutation.isPending && styles.disabled]}
-              onPress={handleSave}
-              disabled={mutation.isPending}
-            >
-              <Text style={styles.primaryText}>{mutation.isPending ? "Saving..." : "Save"}</Text>
-            </TouchableOpacity>
-            <View style={styles.divider} />
-            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-              <Text style={styles.logoutButtonText}>Logout</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.testButton}
-              onPress={() => {
-                Notifications.setNotificationChannelAsync("nudges", {
-                  name: "Nudges",
-                  importance: Notifications.AndroidImportance.DEFAULT,
-                })
-                  .then(() =>
-                    Notifications.requestPermissionsAsync({
-                      ios: { allowAlert: true, allowBadge: true, allowSound: true },
-                    }),
-                  )
-                  .then(() =>
-                    Notifications.scheduleNotificationAsync({
-                      content: { title: "Test nudge", body: "Hello from test button" },
-                      trigger: {
-                        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-                        seconds: 3,
-                      },
-                    }),
-                  )
-                  .then(() => console.log("test notification scheduled"))
-                  .catch((err) => console.error("notif test error", err));
-              }}
-            >
-              <Text style={styles.testButtonText}>Trigger test notification</Text>
-            </TouchableOpacity>
-          </View>
+            <View style={styles.card}>
+              {profile?.username ? (
+                <View style={styles.infoRow}>
+                  <Text style={styles.label}>{t.profile.usernameLabel}</Text>
+                  <Text style={styles.infoValue}>{profile.username}</Text>
+                </View>
+              ) : null}
+              <Input label={t.profile.displayNameLabel} value={name} onChangeText={setName} />
+              <TonePicker
+                value={avatarTone}
+                onChange={setAvatarTone}
+                toneLabels={t.profile.toneLabels}
+              />
+              {profile?.role === "PARENT" ? (
+                <View style={styles.field}>
+                  <Text style={styles.label}>{t.profile.familyTimezoneLabel}</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder={resolvedTimezone}
+                    value={timezoneQuery || familyTimezone}
+                    ref={timezoneInputRef}
+                    onFocus={() => setShowTimezoneSuggestions(true)}
+                    onChangeText={(value) => {
+                      setTimezoneQuery(value);
+                      setFamilyTimezone(value);
+                      setShowTimezoneSuggestions(true);
+                    }}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    returnKeyType="done"
+                    onBlur={() => setShowTimezoneSuggestions(false)}
+                  />
+                  {showTimezoneSuggestions ? (
+                    <View style={styles.suggestionBox}>
+                      <TouchableOpacity
+                        style={styles.suggestionClose}
+                        onPress={() => {
+                          setFamilyTimezone(lastCommittedTimezone);
+                          setTimezoneQuery("");
+                          setShowTimezoneSuggestions(false);
+                          timezoneInputRef.current?.blur();
+                          Keyboard.dismiss();
+                        }}
+                      >
+                        <Text style={styles.suggestionCloseText}>✕</Text>
+                      </TouchableOpacity>
+                      {(timezoneQuery
+                        ? COMMON_TIMEZONES.filter((tz) => {
+                            const q = timezoneQuery.toLowerCase().trim();
+                            return (
+                              tz.name.toLowerCase().includes(q) || tz.offset.toLowerCase().includes(q)
+                            );
+                          })
+                        : COMMON_TIMEZONES)
+                        .slice(0, 8)
+                        .map((tz) => (
+                          <TouchableOpacity
+                            key={tz.name}
+                            style={styles.suggestionRow}
+                            onPress={() => {
+                              setFamilyTimezone(tz.name);
+                              setTimezoneQuery(tz.name);
+                              setLastCommittedTimezone(tz.name);
+                              setShowTimezoneSuggestions(false);
+                            }}
+                          >
+                            <Text style={styles.suggestionText}>
+                              {tz.name} ({tz.offset})
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                    </View>
+                  ) : null}
+                </View>
+              ) : null}
+              <Input
+                label={t.profile.currentPasswordLabel}
+                value={currentPassword}
+                onChangeText={setCurrentPassword}
+                secureTextEntry
+                placeholder={t.profile.currentPasswordPlaceholder}
+              />
+              <Input
+                label={t.profile.newPasswordLabel}
+                value={newPassword}
+                onChangeText={setNewPassword}
+                secureTextEntry
+              />
+              <TouchableOpacity
+                style={[styles.primaryButton, mutation.isPending && styles.disabled]}
+                onPress={handleSave}
+                disabled={mutation.isPending}
+              >
+                <Text style={styles.primaryText}>
+                  {mutation.isPending ? t.profile.saving : t.profile.save}
+                </Text>
+              </TouchableOpacity>
+              <View style={styles.divider} />
+              <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                <Text style={styles.logoutButtonText}>{t.profile.logout}</Text>
+              </TouchableOpacity>
+            </View>
           </ScrollView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
@@ -274,9 +255,11 @@ const Input = ({
 const TonePicker = ({
   value,
   onChange,
+  toneLabels,
 }: {
   value: string;
   onChange: (tone: string) => void;
+  toneLabels: Record<string, string>;
 }) => (
   <View style={styles.toneRow}>
     {Object.keys(TONE_COLORS).map((tone) => (
@@ -286,7 +269,31 @@ const TonePicker = ({
         onPress={() => onChange(tone)}
       >
         <View style={[styles.toneDot, { backgroundColor: TONE_COLORS[tone] }]} />
-        <Text style={value === tone ? styles.toneTextActive : styles.toneText}>{tone}</Text>
+        <Text style={value === tone ? styles.toneTextActive : styles.toneText}>
+          {toneLabels[tone] ?? tone}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+);
+
+const LanguageToggle = ({
+  current,
+  onSelect,
+}: {
+  current: "en" | "mm";
+  onSelect: (language: "en" | "mm") => Promise<void>;
+}) => (
+  <View style={styles.languageToggle}>
+    {(["en", "mm"] as const).map((lang) => (
+      <TouchableOpacity
+        key={lang}
+        style={[styles.languageOption, current === lang && styles.languageOptionActive]}
+        onPress={() => onSelect(lang)}
+      >
+        <Text style={current === lang ? styles.languageOptionTextActive : styles.languageOptionText}>
+          {lang.toUpperCase()}
+        </Text>
       </TouchableOpacity>
     ))}
   </View>
@@ -317,6 +324,29 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: "#6b7280",
+  },
+  languageToggle: {
+    flexDirection: "row",
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    borderRadius: 12,
+    overflow: "hidden",
+    marginLeft: "auto",
+  },
+  languageOption: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  languageOptionActive: {
+    backgroundColor: "#ede9fe",
+  },
+  languageOptionText: {
+    color: "#475569",
+    fontWeight: "600",
+  },
+  languageOptionTextActive: {
+    color: "#4c1d95",
+    fontWeight: "700",
   },
   backButton: {
     paddingVertical: 6,
@@ -420,19 +450,6 @@ const styles = StyleSheet.create({
   },
   logoutButtonText: {
     color: "#dc2626",
-    fontWeight: "700",
-  },
-  testButton: {
-    marginTop: 8,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: "#eef2ff",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#c7d2fe",
-  },
-  testButtonText: {
-    color: "#4338ca",
     fontWeight: "700",
   },
   suggestionBox: {

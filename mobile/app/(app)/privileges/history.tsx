@@ -9,11 +9,12 @@ import {
   View,
 } from "react-native";
 import { useAuth } from "../../../src/context/AuthContext";
+import { useI18n } from "../../../src/context/I18nContext";
 import { fetchPrivilegeRequests, fetchMyPrivilegeRequests } from "../../../src/services/api";
 
-const formatDate = (value?: string | null) => {
+const formatDate = (value?: string | null, fallback?: string) => {
   if (!value) {
-    return "N/A";
+    return fallback ?? "";
   }
   return new Date(value).toLocaleDateString();
 };
@@ -32,6 +33,7 @@ const getToneColor = (tone?: string | null) => TONE_COLORS[tone ?? ""] ?? TONE_C
 export default function PrivilegeHistoryScreen() {
   const router = useRouter();
   const { token, profile } = useAuth();
+  const { translations: t } = useI18n();
   const profileTone = profile?.avatarTone;
   const isParent = profile?.role === "PARENT";
 
@@ -52,20 +54,22 @@ export default function PrivilegeHistoryScreen() {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.headerRow}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backLabel}>← Back</Text>
+            <Text style={styles.backLabel}>← {t.privilegesHistory.back}</Text>
           </TouchableOpacity>
-          <Text style={styles.header}>{isParent ? "Ticket History 📜" : "My Tickets 📜"}</Text>
+          <Text style={styles.header}>
+            {isParent ? t.privilegesHistory.titleParent : t.privilegesHistory.titleChild}
+          </Text>
         </View>
           <Text style={styles.subtitle}>
-            {isParent ? "Review every ticket that was closed." : "Here’s where ended tickets live."}
+            {isParent ? t.privilegesHistory.subtitleParent : t.privilegesHistory.subtitleChild}
           </Text>
 
         {historyQuery.isError ? (
           <Text style={styles.lightText}>
-            {(historyQuery.error as Error)?.message ?? "Unable to load history right now."}
+            {(historyQuery.error as Error)?.message ?? t.privilegesHistory.loadErrorFallback}
           </Text>
         ) : entries.length === 0 ? (
-          <Text style={styles.lightText}>No terminated tickets yet.</Text>
+          <Text style={styles.lightText}>{t.privilegesHistory.noEntries}</Text>
         ) : (
           entries.map((entry) => (
             <View key={entry.id} style={styles.historyCard}>
@@ -79,15 +83,28 @@ export default function PrivilegeHistoryScreen() {
                 <Text style={styles.ticketTitle}>{entry.privilege.title}</Text>
               </View>
               <Text style={styles.ticketMeta}>
-                Cost: <Text style={styles.bold}>{entry.cost} seeds</Text>
+                {t.privilegesHistory.costLabel}:{" "}
+                <Text style={styles.bold}>
+                  {entry.cost} {t.privileges.seedsSuffix}
+                </Text>
               </Text>
               {isParent ? (
                 <Text style={styles.ticketMeta}>
-                  Child: <Text style={styles.bold}>{entry.childName ?? "Unknown"}</Text>
+                  {t.privilegesHistory.childLabel}:{" "}
+                  <Text style={styles.bold}>
+                    {entry.childName ?? t.privilegesHistory.unknownChild}
+                  </Text>
                 </Text>
               ) : null}
-              <Text style={styles.ticketMeta}>Ended: {formatDate(entry.resolvedAt ?? entry.createdAt)}</Text>
-              {entry.note ? <Text style={styles.note}>Note: {entry.note}</Text> : null}
+              <Text style={styles.ticketMeta}>
+                {t.privilegesHistory.endedLabel}:{" "}
+                {formatDate(entry.resolvedAt ?? entry.createdAt, t.privilegesHistory.notAvailable)}
+              </Text>
+              {entry.note ? (
+                <Text style={styles.note}>
+                  {t.privilegesHistory.noteLabel}: {entry.note}
+                </Text>
+              ) : null}
             </View>
           ))
         )}

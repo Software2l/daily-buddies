@@ -18,6 +18,7 @@ import {
   fetchRoutineTemplateDetail,
   updateRoutineTemplate,
 } from "../../../../src/services/api";
+import { useI18n } from "../../../../src/context/I18nContext";
 
 const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 const DAY_LABELS: Record<string, string> = {
@@ -34,6 +35,7 @@ export default function RoutineDetailScreen() {
   const router = useRouter();
   const { templateId } = useLocalSearchParams<{ templateId?: string }>();
   const { token } = useAuth();
+  const { translations: t } = useI18n();
   const queryClient = useQueryClient();
 
   const detailQuery = useQuery({
@@ -42,12 +44,11 @@ export default function RoutineDetailScreen() {
     enabled: !!token && typeof templateId === "string",
   });
 
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    rewardNote: "",
-    days: DAYS,
-  });
+const [form, setForm] = useState({
+  name: "",
+  description: "",
+  days: DAYS,
+});
 
   const [items, setItems] = useState<Array<{ title: string; points: string }>>([{ title: "", points: "1" }]);
 
@@ -56,7 +57,6 @@ export default function RoutineDetailScreen() {
       setForm({
         name: detailQuery.data.name ?? "",
         description: detailQuery.data.description ?? "",
-        rewardNote: detailQuery.data.rewardNote ?? "",
         days: detailQuery.data.daysOfWeek && detailQuery.data.daysOfWeek.length > 0 ? detailQuery.data.daysOfWeek : DAYS,
       });
       setItems(
@@ -82,7 +82,6 @@ export default function RoutineDetailScreen() {
       updateRoutineTemplate(token!, templateId as string, {
         name: form.name.trim(),
         description: form.description || undefined,
-        rewardNote: form.rewardNote || undefined,
         daysOfWeek: form.days,
         items: items.map((item) => ({
           title: item.title || "Task",
@@ -91,10 +90,10 @@ export default function RoutineDetailScreen() {
       }),
     onSuccess: async () => {
       await invalidate();
-      Alert.alert("Updated", "Routine saved.");
+      Alert.alert(t.tasks.routineUpdatedTitle, t.tasks.routineUpdatedMessage);
     },
     onError: (error: Error) => {
-      Alert.alert("Could not save routine", error.message);
+      Alert.alert(t.tasks.templateSaveError, error.message);
     },
   });
 
@@ -105,14 +104,14 @@ export default function RoutineDetailScreen() {
       router.replace("/tasks");
     },
     onError: (error: Error) => {
-      Alert.alert("Could not delete routine", error.message);
+      Alert.alert(t.tasks.deleteRoutineError, error.message);
     },
   });
 
   const handleDelete = () => {
-    Alert.alert("Delete routine?", "This will remove routine tasks for assigned children.", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Delete", style: "destructive", onPress: () => deleteMutation.mutate() },
+    Alert.alert(t.tasks.deleteRoutineConfirmTitle, t.tasks.deleteRoutineConfirmMessage, [
+      { text: t.tasks.back, style: "cancel" },
+      { text: t.tasks.deleteRoutine, style: "destructive", onPress: () => deleteMutation.mutate() },
     ]);
   };
 
@@ -136,7 +135,7 @@ export default function RoutineDetailScreen() {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.centered}>
-          <Text style={styles.errorText}>Unable to load routine.</Text>
+          <Text style={styles.errorText}>{t.tasks.loadRoutineError}</Text>
         </View>
       </SafeAreaView>
     );
@@ -147,37 +146,29 @@ export default function RoutineDetailScreen() {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.headerRow}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backLabel}>← Back</Text>
+            <Text style={styles.backLabel}>← {t.tasks.back}</Text>
           </TouchableOpacity>
-          <Text style={styles.header}>Edit Routine</Text>
+          <Text style={styles.header}>{t.tasks.createRoutine}</Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Routine name</Text>
+          <Text style={styles.label}>{t.tasks.routineNameLabel}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Evening Glow"
+            placeholder={t.tasks.routineNamePlaceholder}
             value={form.name}
             onChangeText={(value) => setForm((prev) => ({ ...prev, name: value }))}
             placeholderTextColor="#94a3b8"
           />
-          <Text style={styles.label}>Description</Text>
+          <Text style={styles.label}>{t.tasks.descriptionLabel}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Optional description"
+            placeholder={t.tasks.routineDescriptionPlaceholder}
             value={form.description}
             onChangeText={(value) => setForm((prev) => ({ ...prev, description: value }))}
             placeholderTextColor="#94a3b8"
           />
-          <Text style={styles.label}>Reward note</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Bonus seeds note"
-            value={form.rewardNote}
-            onChangeText={(value) => setForm((prev) => ({ ...prev, rewardNote: value }))}
-            placeholderTextColor="#94a3b8"
-          />
-          <Text style={styles.label}>Days active</Text>
+          <Text style={styles.label}>{t.tasks.daysActiveLabel}</Text>
           <View style={styles.dayRow}>
             {DAYS.map((day) => (
               <TouchableOpacity
@@ -193,7 +184,7 @@ export default function RoutineDetailScreen() {
                 }
               >
                 <Text style={form.days.includes(day) ? styles.dayTextActive : styles.dayText}>
-                  {DAY_LABELS[day]}
+                  {t.tasks.dayLabels?.[day] ?? day}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -201,7 +192,9 @@ export default function RoutineDetailScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Routine tasks</Text>
+          <Text style={styles.sectionTitle}>
+            {items.length} {t.tasks.routineTasksLabel}
+          </Text>
           {items.map((item, index) => (
             <View key={`routine-item-${index}`} style={styles.itemRow}>
               <TextInput
@@ -236,7 +229,7 @@ export default function RoutineDetailScreen() {
                   style={styles.removeItemButton}
                   onPress={() => setItems((prev) => prev.filter((_, idx) => idx !== index))}
                 >
-                  <Text style={styles.removeItemText}>Remove</Text>
+                  <Text style={styles.removeItemText}>{t.tasks.removeTask}</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -244,14 +237,14 @@ export default function RoutineDetailScreen() {
           <TouchableOpacity
             onPress={() => setItems((prev) => [...prev, { title: "", points: "1" }])}
           >
-            <Text style={styles.addLink}>+ Add another task</Text>
+            <Text style={styles.addLink}>{t.tasks.addRoutineTask}</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Currently assigned</Text>
+          <Text style={styles.sectionTitle}>{t.tasks.currentlyAssigned}</Text>
           {assignments.length === 0 ? (
-            <Text style={styles.lightText}>No children assigned. Use the main screen to assign.</Text>
+            <Text style={styles.lightText}>{t.tasks.noAssigned}</Text>
           ) : (
             assignments.map((assignment) => (
               <View key={assignment.childId} style={styles.assignmentTag}>
@@ -267,7 +260,7 @@ export default function RoutineDetailScreen() {
           disabled={updateMutation.isPending}
         >
           <Text style={styles.primaryButtonText}>
-            {updateMutation.isPending ? "Saving..." : "Save routine"}
+            {updateMutation.isPending ? t.tasks.saving : t.tasks.saveRoutine}
           </Text>
         </TouchableOpacity>
 
@@ -277,7 +270,7 @@ export default function RoutineDetailScreen() {
           disabled={deleteMutation.isPending}
         >
           <Text style={styles.deleteButtonText}>
-            {deleteMutation.isPending ? "Deleting..." : "Delete routine"}
+            {deleteMutation.isPending ? t.tasks.deleteRoutineLoading : t.tasks.deleteRoutine}
           </Text>
         </TouchableOpacity>
       </ScrollView>

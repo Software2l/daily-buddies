@@ -14,6 +14,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useAuth } from "../../../src/context/AuthContext";
+import { useI18n } from "../../../src/context/I18nContext";
 import {
   assignRoutineTemplate,
   assignTask,
@@ -30,15 +31,6 @@ import {
 } from "../../../src/services/api";
 
 const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-const DAY_LABELS: Record<string, string> = {
-  SUN: "Sun",
-  MON: "Mon",
-  TUE: "Tue",
-  WED: "Wed",
-  THU: "Thu",
-  FRI: "Fri",
-  SAT: "Sat",
-};
 
 const TONE_COLORS: Record<string, string> = {
   sunrise: "#fb923c",
@@ -51,10 +43,12 @@ const TONE_COLORS: Record<string, string> = {
 
 export default function TasksScreen() {
   const { profile, token } = useAuth();
+  const { translations: t } = useI18n();
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
   const router = useRouter();
   const isParent = profile?.role === "PARENT";
+  const DAY_LABELS = t.tasks.dayLabels ?? {};
 
   const tasksQuery = useQuery({
     queryKey: ["tasks", token],
@@ -130,20 +124,19 @@ export default function TasksScreen() {
     childId: "",
   });
 
-  const [templateForm, setTemplateForm] = useState({
-    name: "",
-    description: "",
-    rewardNote: "",
-    days: DAYS,
-    items: [{ title: "", points: "1" }],
-  });
+const [templateForm, setTemplateForm] = useState({
+  name: "",
+  description: "",
+  days: DAYS,
+  items: [{ title: "", points: "1" }],
+});
 
   const children =
     familyQuery.data?.filter((member) => member.role === "CHILD") ?? [];
 
   const handleCreateTask = async () => {
     if (!taskForm.title.trim()) {
-      Alert.alert("Title required", "Name your task first.");
+      Alert.alert(t.tasks.titleRequiredTitle, t.tasks.titleRequiredMessage);
       return;
     }
 
@@ -162,41 +155,39 @@ export default function TasksScreen() {
 
       setTaskForm({ title: "", points: "1", childId: "" });
     } catch (error) {
-      Alert.alert("Could not create task", (error as Error).message);
+      Alert.alert(t.tasks.createTaskError, (error as Error).message);
     }
   };
 
   const handleCreateTemplate = async () => {
     if (!templateForm.name.trim()) {
-      Alert.alert("Template needs a name", "Give your routine a short title.");
+      Alert.alert(t.tasks.templateNameRequiredTitle, t.tasks.templateNameRequiredMessage);
       return;
     }
 
     if (!templateForm.items.length || !templateForm.items[0].title.trim()) {
-      Alert.alert("Add at least one task", "Templates require at least one item.");
+      Alert.alert(t.tasks.templateItemRequiredTitle, t.tasks.templateItemRequiredMessage);
       return;
     }
 
     try {
       await createTemplateMutation.mutateAsync({
-        name: templateForm.name.trim(),
-        description: templateForm.description || undefined,
-        rewardNote: templateForm.rewardNote || undefined,
-        daysOfWeek: templateForm.days,
-        items: templateForm.items.map((item) => ({
-          title: item.title || "Task",
-          points: Number(item.points) || 1,
-        })),
+      name: templateForm.name.trim(),
+      description: templateForm.description || undefined,
+      daysOfWeek: templateForm.days,
+      items: templateForm.items.map((item) => ({
+        title: item.title || "Task",
+        points: Number(item.points) || 1,
+      })),
       });
       setTemplateForm({
         name: "",
         description: "",
-        rewardNote: "",
         days: DAYS,
         items: [{ title: "", points: "1" }],
       });
     } catch (error) {
-      Alert.alert("Could not save routine", (error as Error).message);
+      Alert.alert(t.tasks.templateSaveError, (error as Error).message);
     }
   };
 
@@ -215,9 +206,9 @@ export default function TasksScreen() {
       >
         <View style={styles.headerRow}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backLabel}>← Back</Text>
+            <Text style={styles.backLabel}>← {t.tasks.back}</Text>
           </TouchableOpacity>
-          <Text style={styles.header}>Tasks & Routines</Text>
+          <Text style={styles.header}>{t.tasks.titleParent}</Text>
         </View>
 
         <View style={styles.tabRow}>
@@ -228,7 +219,7 @@ export default function TasksScreen() {
               onPress={() => setActiveTab(tab)}
             >
               <Text style={activeTab === tab ? styles.tabTextActive : styles.tabText}>
-                {tab === "TASKS" ? "Tasks" : "Routines"}
+                {tab === "TASKS" ? t.tasks.tabTasks : t.tasks.tabRoutines}
               </Text>
             </TouchableOpacity>
           ))}
@@ -236,14 +227,14 @@ export default function TasksScreen() {
 
         {activeTab === "TASKS" ? (
           <>
-            <Section title="Quick Task">
+            <Section title={t.tasks.quickTask}>
               <Input
-                placeholder="Brush teeth"
+                placeholder={t.tasks.quickTaskPlaceholder}
                 value={taskForm.title}
                 onChangeText={(value) => setTaskForm((prev) => ({ ...prev, title: value }))}
               />
               <Input
-                placeholder="Points"
+                placeholder={t.tasks.pointsPlaceholder}
                 keyboardType="numeric"
                 value={taskForm.points}
                 onChangeText={(value) => setTaskForm((prev) => ({ ...prev, points: value }))}
@@ -253,19 +244,25 @@ export default function TasksScreen() {
                 selectedId={taskForm.childId}
                 onSelect={(childId) => setTaskForm((prev) => ({ ...prev, childId }))}
               />
-              <PrimaryButton title="Create Task" onPress={handleCreateTask} loading={createTaskMutation.isPending} />
+              <PrimaryButton
+                title={t.tasks.createTask}
+                onPress={handleCreateTask}
+                loading={createTaskMutation.isPending}
+              />
             </Section>
 
-            <Section title="Today's Tasks">
+            <Section title={t.tasks.todaysTasks}>
               {manualTasks.length === 0 && (
-                <Text style={styles.lightText}>No standalone tasks yet.</Text>
+                <Text style={styles.lightText}>{t.tasks.noStandaloneTasks}</Text>
               )}
               {manualTasks.map((task) => (
                 <View key={task.id} style={styles.taskCard}>
                   <Text style={styles.taskTitle}>{task.title}</Text>
-                  <Text style={styles.lightText}>{task.points} seeds</Text>
+                  <Text style={styles.lightText}>
+                    {task.points} {t.tasks.seedsSuffix}
+                  </Text>
                   {task.assignments.length === 0 ? (
-                    <Text style={styles.lightText}>No children assigned yet.</Text>
+                    <Text style={styles.lightText}>{t.tasks.noChildrenAssigned}</Text>
                   ) : (
                     <View style={styles.assignmentRow}>
                       {task.assignments.map((assignment) => (
@@ -289,20 +286,20 @@ export default function TasksScreen() {
                     style={styles.manageButton}
                     onPress={() => router.push(`/tasks/${task.id}`)}
                   >
-                    <Text style={styles.manageButtonText}>Open Task</Text>
+                    <Text style={styles.manageButtonText}>{t.tasks.openTask}</Text>
                   </TouchableOpacity>
                 </View>
               ))}
               <TouchableOpacity style={styles.linkButton} onPress={() => router.push("/history")}>
-                <Text style={styles.linkText}>View history</Text>
+                <Text style={styles.linkText}>{t.tasks.viewHistory}</Text>
               </TouchableOpacity>
             </Section>
           </>
         ) : (
           <>
-            <Section title="Routine Templates">
+            <Section title={t.tasks.routineTemplates}>
               {templates.length === 0 && (
-                <Text style={styles.lightText}>No templates yet. Start with Morning Routine?</Text>
+                <Text style={styles.lightText}>{t.tasks.noTemplates}</Text>
               )}
               {templates.map((template) => (
                 <TemplateCard
@@ -321,21 +318,16 @@ export default function TasksScreen() {
               ))}
             </Section>
 
-            <Section title="Create a routine">
+            <Section title={t.tasks.createRoutine}>
               <Input
-                placeholder="Morning Glow"
+                placeholder={t.tasks.routineNamePlaceholder}
                 value={templateForm.name}
                 onChangeText={(value) => setTemplateForm((prev) => ({ ...prev, name: value }))}
               />
               <Input
-                placeholder="Optional description"
+                placeholder={t.tasks.routineDescriptionPlaceholder}
                 value={templateForm.description}
                 onChangeText={(value) => setTemplateForm((prev) => ({ ...prev, description: value }))}
-              />
-              <Input
-                placeholder="Reward note"
-                value={templateForm.rewardNote}
-                onChangeText={(value) => setTemplateForm((prev) => ({ ...prev, rewardNote: value }))}
               />
               <View style={styles.dayRow}>
                 {DAYS.map((day) => (
@@ -359,7 +351,7 @@ export default function TasksScreen() {
                         templateForm.days.includes(day) ? styles.dayTextActive : styles.dayText
                       }
                     >
-                      {DAY_LABELS[day]}
+                      {DAY_LABELS[day] ?? day}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -401,10 +393,10 @@ export default function TasksScreen() {
                   }))
                 }
               >
-                <Text style={styles.link}>+ Add another task</Text>
+                <Text style={styles.link}>{t.tasks.addAnotherTask}</Text>
               </TouchableOpacity>
               <PrimaryButton
-                title="Save Template"
+                title={t.tasks.saveTemplate}
                 onPress={handleCreateTemplate}
                 loading={createTemplateMutation.isPending}
               />
@@ -425,13 +417,13 @@ export default function TasksScreen() {
         keyboardDismissMode="none"
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.header}>My Missions</Text>
-        {tasks.length === 0 && <Text style={styles.lightText}>No tasks assigned yet.</Text>}
+        <Text style={styles.header}>{t.tasks.titleChild}</Text>
+        {tasks.length === 0 && <Text style={styles.lightText}>{t.tasks.myTasksEmpty}</Text>}
         {tasks.map((task) => (
           <View key={task.id} style={styles.childTaskCard}>
             <Text style={styles.taskTitle}>{task.title}</Text>
             <Text style={styles.lightText}>
-              {task.points} seed{task.points === 1 ? "" : "s"}
+              {task.points} {t.tasks.seedsSuffix}
               {task.routineName ? ` • ${task.routineName}` : ""}
             </Text>
             <TouchableOpacity
@@ -443,7 +435,7 @@ export default function TasksScreen() {
               onPress={() => childCompleteTaskMutation.mutate(task.id)}
             >
               <Text style={styles.primaryButtonText}>
-                {task.status === "COMPLETED" ? "Done" : "Mark Complete"}
+                {task.status === "COMPLETED" ? t.tasks.done : t.tasks.markComplete}
               </Text>
             </TouchableOpacity>
           </View>
@@ -494,7 +486,7 @@ const ChildPicker = ({
 }) => (
   <View style={styles.childSelectRow}>
     {children.length === 0 ? (
-      <Text style={styles.lightText}>Add a child to assign.</Text>
+      <Text style={styles.lightText}>{useI18n().translations.tasks.childAddPrompt}</Text>
     ) : (
       children.map((child) => (
         <TouchableOpacity
@@ -534,21 +526,23 @@ const TemplateCard = ({
   onUnassign: (childId: string) => void;
   onManage: () => void;
 }) => {
-  const assignedMap = new Map((template.assignments ?? []).map((assignment) => [assignment.childId, assignment]));
-  return (
-  <View style={styles.templateCard}>
-    <Text style={styles.taskTitle}>{template.name}</Text>
-    <Text style={styles.lightText}>{template.items.length} tasks inside</Text>
+	const { translations: t } = useI18n();
+	const dayLabels = t.tasks.dayLabels ?? {};
+	const assignedMap = new Map((template.assignments ?? []).map((assignment) => [assignment.childId, assignment]));
+	const itemCount = template.items?.length ?? 0;
+	return (
+	<View style={styles.templateCard}>
+		<Text style={styles.taskTitle}>{template.name}</Text>
+		<Text style={styles.lightText}>
+			{itemCount} {t.tasks.routineTasksLabel}
+		</Text>
     <View style={styles.dayRow}>
       {(template.daysOfWeek ?? DAYS).map((day) => (
         <View key={day} style={styles.dayBadge}>
-          <Text style={styles.dayTextActive}>{DAY_LABELS[day]}</Text>
+          <Text style={styles.dayTextActive}>{dayLabels[day] ?? day}</Text>
         </View>
       ))}
     </View>
-    {template.rewardNote ? (
-      <Text style={styles.lightText}>Reward: {template.rewardNote}</Text>
-    ) : null}
     {template.assignments && template.assignments.length > 0 && (
       <View style={styles.assignmentRow}>
         {template.assignments.map((assignment) => (
@@ -569,7 +563,7 @@ const TemplateCard = ({
     )}
     <View style={styles.childButtons}>
       {childrenList.length === 0 ? (
-        <Text style={styles.lightText}>Add a child to assign this routine.</Text>
+        <Text style={styles.lightText}>{t.tasks.childAddPromptRoutine}</Text>
       ) : (
         childrenList.map((child) => (
           <TouchableOpacity
@@ -590,14 +584,16 @@ const TemplateCard = ({
                 assignedMap.has(child.id) && styles.assignButtonTextActive,
               ]}
             >
-              {assignedMap.has(child.id) ? `Remove ${child.name}` : `Assign ${child.name}`}
+              {assignedMap.has(child.id)
+                ? t.tasks.removeAssignButton(child.name)
+                : t.tasks.assignButton(child.name)}
             </Text>
           </TouchableOpacity>
         ))
       )}
     </View>
     <TouchableOpacity style={styles.manageButton} onPress={onManage}>
-      <Text style={styles.manageButtonText}>Open Routine</Text>
+      <Text style={styles.manageButtonText}>{t.tasks.openRoutine}</Text>
     </TouchableOpacity>
   </View>
 );
@@ -611,15 +607,20 @@ const PrimaryButton = ({
   title: string;
   onPress: () => void;
   loading?: boolean;
-}) => (
-  <TouchableOpacity
-    style={[styles.primaryButton, loading && styles.disabledButton]}
-    disabled={loading}
-    onPress={onPress}
-  >
-    <Text style={styles.primaryButtonText}>{loading ? "Please wait..." : title}</Text>
-  </TouchableOpacity>
-);
+}) => {
+  const { translations: t } = useI18n();
+  return (
+    <TouchableOpacity
+      style={[styles.primaryButton, loading && styles.disabledButton]}
+      disabled={loading}
+      onPress={onPress}
+    >
+      <Text style={styles.primaryButtonText}>
+        {loading ? t.tasks.taskPleaseWait : title}
+      </Text>
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   safe: {

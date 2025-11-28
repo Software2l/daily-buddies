@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../../src/context/AuthContext";
+import { useI18n } from "../../../../src/context/I18nContext";
 import {
   fetchFamilyMembers,
   inviteParent,
@@ -17,6 +18,7 @@ import {
 export default function ParentManageScreen() {
   const router = useRouter();
   const { token } = useAuth();
+  const { translations: t } = useI18n();
   const queryClient = useQueryClient();
   const isAuthenticated = Boolean(token);
 
@@ -146,7 +148,7 @@ export default function ParentManageScreen() {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.centered}>
-          <Text style={styles.lightText}>Connecting to your family...</Text>
+          <Text style={styles.lightText}>{t.manageAccounts.connecting}</Text>
         </View>
       </SafeAreaView>
     );
@@ -159,12 +161,12 @@ export default function ParentManageScreen() {
 					<TouchableOpacity
 						style={styles.backButton}
 						onPress={() => router.back()}>
-						<Text style={styles.backLabel}>← Back</Text>
+						<Text style={styles.backLabel}>← {t.manageAccounts.back}</Text>
 					</TouchableOpacity>
-					<Text style={styles.header}>Manage Accounts 👨‍👩‍👧</Text>
+					<Text style={styles.header}>{t.manageAccounts.title}</Text>
 				</View>
 
-				<Text style={styles.sectionTitle}>Parents</Text>
+				<Text style={styles.sectionTitle}>{t.manageAccounts.parents}</Text>
 				{parents.map((parent, index) => (
 					<MemberRow
 						key={parent.id}
@@ -180,15 +182,15 @@ export default function ParentManageScreen() {
 								? undefined
 								: () =>
 										Alert.alert(
-											"Remove parent?",
-											"This parent will lose access to the family account.",
+											t.manageAccounts.removeParentTitle,
+											t.manageAccounts.removeParentMessage,
 											[
 												{
-													text: "Cancel",
+													text: t.manageAccounts.cancel,
 													style: "cancel",
 												},
 												{
-													text: "Remove",
+													text: t.manageAccounts.remove,
 													style: "destructive",
 													onPress: () =>
 														deleteMemberMutation.mutate(
@@ -204,14 +206,14 @@ export default function ParentManageScreen() {
 				<View style={styles.inviteCard}>
 					<View style={styles.inviteHeader}>
 						<Text style={styles.sectionTitle}>
-							Invite another parent
+							{t.manageAccounts.inviteParent}
 						</Text>
 						{!showInviteParent && (
 							<TouchableOpacity
 								onPress={() => setShowInviteParent(true)}
 								style={styles.showFormButton}>
 								<Text style={styles.showFormText}>
-									Show form
+									{t.manageAccounts.showForm}
 								</Text>
 							</TouchableOpacity>
 						)}
@@ -220,7 +222,7 @@ export default function ParentManageScreen() {
 					{showInviteParent && (
 						<>
 							<Input
-								placeholder="Name"
+								placeholder={t.manageAccounts.namePlaceholder}
 								value={parentForm.name}
 								onChangeText={(value: string) =>
 									setParentForm(prev => ({
@@ -230,7 +232,7 @@ export default function ParentManageScreen() {
 								}
 							/>
 							<Input
-								placeholder="Username"
+								placeholder={t.manageAccounts.usernamePlaceholder}
 								autoCapitalize="none"
 								value={parentForm.username}
 								onChangeText={(value: string) =>
@@ -241,7 +243,7 @@ export default function ParentManageScreen() {
 								}
 							/>
 							<Input
-								placeholder="Email"
+								placeholder={t.manageAccounts.emailPlaceholder}
 								autoCapitalize="none"
 								keyboardType="email-address"
 								value={parentForm.email}
@@ -253,7 +255,7 @@ export default function ParentManageScreen() {
 								}
 							/>
 							<Input
-								placeholder="Password"
+								placeholder={t.manageAccounts.passwordPlaceholder}
 								secureTextEntry
 								value={parentForm.password}
 								onChangeText={(value: string) =>
@@ -264,14 +266,14 @@ export default function ParentManageScreen() {
 								}
 							/>
 							<PrimaryButton
-								title="Send Invite"
+								title={t.manageAccounts.sendInvite}
 								onPress={handleInviteParent}
 							/>
 						</>
 					)}
 				</View>
 
-				<Text style={styles.sectionTitle}>Children</Text>
+				<Text style={styles.sectionTitle}>{t.manageAccounts.children}</Text>
 				{children.map(child => (
 					<MemberRow
 						key={child.id}
@@ -284,12 +286,12 @@ export default function ParentManageScreen() {
 						}
 						onRemove={() =>
 							Alert.alert(
-								"Remove child?",
-								"Their tasks, routines, and rewards history will also be deleted.",
+								t.manageAccounts.removeChildTitle,
+								t.manageAccounts.removeChildMessage,
 								[
-									{ text: "Cancel", style: "cancel" },
+									{ text: t.manageAccounts.cancel, style: "cancel" },
 									{
-										text: "Remove",
+										text: t.manageAccounts.remove,
 										style: "destructive",
 										onPress: () =>
 											deleteMemberMutation.mutate(
@@ -303,16 +305,16 @@ export default function ParentManageScreen() {
 				))}
 
 				<View style={styles.inviteCard}>
-					<Text style={styles.sectionTitle}>Add a child</Text>
+					<Text style={styles.sectionTitle}>{t.manageAccounts.addChild}</Text>
 					<Input
-						placeholder="Name"
+						placeholder={t.manageAccounts.namePlaceholder}
 						value={childForm.name}
 						onChangeText={(value: string) =>
 							setChildForm(prev => ({ ...prev, name: value }))
 						}
 					/>
 					<Input
-						placeholder="Username"
+						placeholder={t.manageAccounts.usernamePlaceholder}
 						autoCapitalize="none"
 						value={childForm.username}
 						onChangeText={(value: string) =>
@@ -320,7 +322,7 @@ export default function ParentManageScreen() {
 						}
 					/>
 					<Input
-						placeholder="Email (optional)"
+						placeholder={t.manageAccounts.optionalEmailPlaceholder}
 						autoCapitalize="none"
 						keyboardType="email-address"
 						value={childForm.email}
@@ -329,7 +331,7 @@ export default function ParentManageScreen() {
 						}
 					/>
 					<Input
-						placeholder="Password"
+						placeholder={t.manageAccounts.passwordPlaceholder}
 						secureTextEntry
 						value={childForm.password}
 						onChangeText={(value: string) =>
@@ -343,18 +345,17 @@ export default function ParentManageScreen() {
 						}
 					/>
 					<PrimaryButton
-						title="Add Child"
+						title={t.manageAccounts.addChild}
 						onPress={handleAddChild}
 					/>
 				</View>
 
 				<View style={styles.dangerCard}>
 					<Text style={styles.sectionTitle}>
-						Delete family account
+						{t.manageAccounts.deleteFamilyTitle}
 					</Text>
 					<Text style={styles.warningText}>
-						This will permanently remove all accounts, data, and
-						rewards for this family. This action cannot be undone.
+						{t.manageAccounts.deleteFamilyWarning}
 					</Text>
 					<TouchableOpacity
 						style={[
@@ -364,12 +365,12 @@ export default function ParentManageScreen() {
 						]}
 						onPress={() =>
 							Alert.alert(
-								"Delete family?",
-								"This will permanently erase your family data.",
+								t.manageAccounts.deleteFamilyConfirmTitle,
+								t.manageAccounts.deleteFamilyConfirmMessage,
 								[
-									{ text: "Cancel", style: "cancel" },
+									{ text: t.manageAccounts.cancel, style: "cancel" },
 									{
-										text: "Delete",
+										text: t.manageAccounts.deleteFamily,
 										style: "destructive",
 										onPress: () =>
 											deleteFamilyMutation.mutate(),
@@ -380,8 +381,8 @@ export default function ParentManageScreen() {
 						disabled={deleteFamilyMutation.isPending}>
 						<Text style={styles.deleteButtonText}>
 							{deleteFamilyMutation.isPending
-								? "Deleting..."
-								: "Delete Family"}
+								? t.manageAccounts.deletingFamily
+								: t.manageAccounts.deleteFamily}
 						</Text>
 					</TouchableOpacity>
 				</View>
@@ -403,29 +404,34 @@ const MemberRow = ({
   const [handle, setHandle] = useState(member.username);
   const [tone, setTone] = useState(member.avatarTone ?? "sunrise");
   const [password, setPassword] = useState("");
+  const { translations: t } = useI18n();
 
   return (
     <View style={styles.memberRow}>
       <Text style={styles.memberName}>{member.name}</Text>
       <Text style={styles.lightText}>
-        {member.email ? `Email: ${member.email}` : "No email on file"}
+        {member.email ? `${t.manageAccounts.emailPlaceholder}: ${member.email}` : t.manageAccounts.noEmail}
       </Text>
-      <Input placeholder="Display name" value={name} onChangeText={(value) => setName(value)} />
       <Input
-        placeholder="Username"
+        placeholder={t.manageAccounts.displayNamePlaceholder}
+        value={name}
+        onChangeText={(value) => setName(value)}
+      />
+      <Input
+        placeholder={t.manageAccounts.usernamePlaceholder}
         autoCapitalize="none"
         value={handle}
         onChangeText={(value) => setHandle(value)}
       />
       <TonePicker value={tone} onChange={setTone} />
       <Input
-        placeholder="New password"
+        placeholder={t.manageAccounts.newPasswordPlaceholder}
         value={password}
         onChangeText={(value) => setPassword(value)}
         secureTextEntry
       />
       <PrimaryButton
-        title="Save"
+        title={t.manageAccounts.save}
         onPress={() => {
           const nextUsername = handle.trim().toLowerCase();
           onSave({
@@ -439,7 +445,7 @@ const MemberRow = ({
       />
       {onRemove && (
         <TouchableOpacity style={styles.removeButton} onPress={onRemove}>
-          <Text style={styles.removeButtonText}>Remove</Text>
+          <Text style={styles.removeButtonText}>{t.manageAccounts.remove}</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -636,7 +642,6 @@ const styles = StyleSheet.create({
   },
   warningText: {
     color: "#b91c1c",
-    lineHeight: 18,
   },
   deleteButton: {
     borderWidth: 1,

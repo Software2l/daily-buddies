@@ -13,10 +13,12 @@ import {
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../../src/context/AuthContext";
+import { useI18n } from "../../src/context/I18nContext";
 
 export default function LoginScreen() {
   const router = useRouter();
   const { login } = useAuth();
+  const { translations: t, language, setLanguage } = useI18n();
   const insets = useSafeAreaInsets();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -24,7 +26,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!identifier || !password) {
-      Alert.alert("Missing info", "Please enter your username or email and password.");
+      Alert.alert(t.auth.login.missingInfoTitle, t.auth.login.missingInfoMessage);
       return;
     }
 
@@ -33,7 +35,7 @@ export default function LoginScreen() {
       await login(identifier.trim(), password);
       router.replace("/home");
     } catch (error) {
-      Alert.alert("Could not sign in", (error as Error).message);
+      Alert.alert(t.auth.login.signInErrorTitle, (error as Error).message);
     } finally {
       setSubmitting(false);
     }
@@ -51,32 +53,34 @@ export default function LoginScreen() {
           keyboardDismissMode="none"
           showsVerticalScrollIndicator={false}
         >
+          <View style={styles.languageRow}>
+            <LanguageToggle current={language} onSelect={setLanguage} />
+          </View>
+
           <View style={styles.card}>
-            <Text style={styles.title}>Welcome Back 🌱</Text>
-            <Text style={styles.subtitle}>
-              Gentle routines await. Sign in to sync with your Daily Buddy.
-            </Text>
+            <Text style={styles.title}>{t.auth.login.title}</Text>
+            <Text style={styles.subtitle}>{t.auth.login.subtitle}</Text>
 
             <View style={styles.field}>
-              <Text style={styles.label}>Username or Email</Text>
+              <Text style={styles.label}>{t.auth.login.identifierLabel}</Text>
               <TextInput
                 style={styles.input}
                 autoCapitalize="none"
                 value={identifier}
                 onChangeText={setIdentifier}
-                placeholder="maya or mom@example.com"
+                placeholder={t.auth.login.identifierPlaceholder}
               />
             </View>
 
             <View style={styles.field}>
-              <Text style={styles.label}>Password</Text>
+              <Text style={styles.label}>{t.auth.login.passwordLabel}</Text>
               <TextInput
                 style={styles.input}
                 autoCapitalize="none"
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}
-                placeholder="••••••••"
+                placeholder={t.auth.login.passwordPlaceholder}
               />
             </View>
 
@@ -85,13 +89,15 @@ export default function LoginScreen() {
               disabled={submitting}
               style={[styles.button, submitting && styles.buttonDisabled]}
             >
-              <Text style={styles.buttonText}>{submitting ? "Signing in..." : "Sign In"}</Text>
+              <Text style={styles.buttonText}>
+                {submitting ? t.auth.login.signingIn : t.auth.login.signIn}
+              </Text>
             </TouchableOpacity>
 
             <View style={styles.linkRow}>
-              <Text style={styles.lightText}>Need an account?</Text>
+              <Text style={styles.lightText}>{t.auth.login.needAccount}</Text>
               <Link href="/register" style={styles.link}>
-                Create one
+                {t.auth.login.createOne}
               </Link>
             </View>
           </View>
@@ -133,7 +139,6 @@ const styles = StyleSheet.create({
   subtitle: {
     color: "#6b7280",
     fontSize: 14,
-    lineHeight: 20,
   },
   field: {
     gap: 6,
@@ -176,4 +181,52 @@ const styles = StyleSheet.create({
     color: "#6c63ff",
     fontWeight: "600",
   },
+  languageRow: {
+    alignSelf: "flex-end",
+    marginBottom: 8,
+  },
+  languageToggle: {
+    flexDirection: "row",
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  languageOption: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  languageOptionActive: {
+    backgroundColor: "#ede9fe",
+  },
+  languageOptionText: {
+    color: "#475569",
+    fontWeight: "600",
+  },
+  languageOptionTextActive: {
+    color: "#4c1d95",
+    fontWeight: "700",
+  },
 });
+
+const LanguageToggle = ({
+  current,
+  onSelect,
+}: {
+  current: "en" | "mm";
+  onSelect: (language: "en" | "mm") => Promise<void>;
+}) => (
+  <View style={styles.languageToggle}>
+    {(["en", "mm"] as const).map(lang => (
+      <TouchableOpacity
+        key={lang}
+        style={[styles.languageOption, current === lang && styles.languageOptionActive]}
+        onPress={() => onSelect(lang)}
+      >
+        <Text style={current === lang ? styles.languageOptionTextActive : styles.languageOptionText}>
+          {lang.toUpperCase()}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+);
